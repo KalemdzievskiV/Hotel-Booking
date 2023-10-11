@@ -24,6 +24,12 @@ public class UserController {
         return new ResponseEntity<>(userService.addNewUser(user), HttpStatus.CREATED);
     }
 
+    @GetMapping("/find/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getUserList();
