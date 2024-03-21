@@ -40,6 +40,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateUser(User user) {
+        User newUser = userRepository.findById(user.getId()).orElse(null);
+        Optional.ofNullable(user.getFirstName()).ifPresent(newUser::setFirstName);
+        Optional.ofNullable(user.getLastName()).ifPresent(newUser::setLastName);
+        Optional.ofNullable(user.getMemberSince()).ifPresent(newUser::setMemberSince);
+        Optional.ofNullable(user.getUserRole()).ifPresent(newUser::setUserRole);
+        Optional.ofNullable(user.getPhoneNumber()).ifPresent(newUser::setPhoneNumber);
+        Optional.ofNullable(user.getEmail()).ifPresent(newUser::setEmail);
+        if (user.getPassword() != null){
+
+        }
+        userRepository.save(newUser);
+        return newUser;
+    }
+
+    @Override
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
