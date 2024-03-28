@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,8 +19,8 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    private String dateIn;
-    private String dateOut;
+    private LocalDateTime start;
+    private LocalDateTime finish;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

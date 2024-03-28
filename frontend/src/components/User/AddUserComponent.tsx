@@ -120,3 +120,4 @@ function AddUserComponent({ onClose, userToUpdate }: AddUserComponentProps) {
 }
 
 export default AddUserComponent;
+

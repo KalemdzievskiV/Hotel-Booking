@@ -23,19 +23,24 @@ public class RoomController {
         return new ResponseEntity<>(roomService.addNewRoom(room), HttpStatus.CREATED);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<Room> updateRoom(@RequestBody Room room) {
+        return new ResponseEntity<>(roomService.updateRoom(room), HttpStatus.OK);
+    }
+
     @GetMapping("/find/{id}")
     public ResponseEntity<Room> getRoomById(@PathVariable("id") Long id) {
         Room room = roomService.getRoomById(id);
         return new ResponseEntity<>(room, HttpStatus.OK);
     }
 
-    @PostMapping("/list")
+    @GetMapping("/list")
     public ResponseEntity<List<Room>> getAllRooms() {
         List<Room> rooms = roomService.getRoomList();
         return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
-    @PostMapping("/find/{number}")
+    @GetMapping("/find/{number}")
     public ResponseEntity<Room> getRoomByNumber(@PathVariable("number") String number) {
         Room room = roomService.getRoomByNumber(number);
         return new ResponseEntity<>(room, HttpStatus.OK);

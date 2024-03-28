@@ -35,6 +35,18 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public Room updateRoom(Room room) {
+        Room newRoom = roomRepository.findById(room.getId()).orElse(null);
+        Optional.ofNullable(room.getNumber()).ifPresent(newRoom::setNumber);
+        Optional.ofNullable(room.getName()).ifPresent(newRoom::setName);
+        Optional.ofNullable(room.getStatus()).ifPresent(newRoom::setStatus);
+        Optional.ofNullable(room.getDescription()).ifPresent(newRoom::setDescription);
+        Optional.ofNullable(room.getMaxCapacity()).ifPresent(newRoom::setMaxCapacity);
+        roomRepository.save(newRoom);
+        return newRoom;
+    }
+
+    @Override
     public Room getRoomById(Long id) {
         return roomRepository.findById(id).orElse(null);
     }

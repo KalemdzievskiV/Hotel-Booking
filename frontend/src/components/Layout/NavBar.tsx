@@ -1,6 +1,7 @@
 import { AppBar, Box, Button, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography } from '@mui/material';
 import React from 'react';
 import { Menu as MenuIcon } from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     /**
@@ -11,11 +12,40 @@ interface Props {
   }
   
   const drawerWidth = 240;
-  const navItems = ['Home', 'About', 'Contact'];
+
 
 function NavBar(props: Props) {
     const { window } = props;
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const navigate = useNavigate();
+
+  const navItems = [
+    {
+      id:1,
+      text: "Home",
+      onClick: () => navigate("/"),
+    },
+    {
+      id:2,
+      text: "Calendar",
+      onClick: () => navigate("/calendar"),
+    },
+    {
+      id:3,
+      text: "Users",
+      onClick: () => navigate("/user"),
+    },
+    {
+      id:4,
+      text: "Rooms",
+      onClick: () => navigate("/room"),
+    },
+    {
+      id:5,
+      text: "Reservations",
+      onClick: () => navigate("/reservation"),
+    }
+  ];
   
     const handleDrawerToggle = () => {
       setMobileOpen((prevState) => !prevState);
@@ -29,9 +59,9 @@ function NavBar(props: Props) {
         <Divider />
         <List>
           {navItems.map((item) => (
-            <ListItem key={item} disablePadding>
-              <ListItemButton sx={{ textAlign: 'center' }}>
-                <ListItemText primary={item} />
+            <ListItem key={item.id} disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }} onClick={item.onClick}>
+                <ListItemText primary={item.id} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -64,8 +94,8 @@ function NavBar(props: Props) {
             </Typography>
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               {navItems.map((item) => (
-                <Button key={item} sx={{ color: '#fff' }}>
-                  {item}
+                <Button key={item.text} onClick={item.onClick} sx={{ color: '#fff' }}>
+                  {item.text}
                 </Button>
               ))}
             </Box>

@@ -1,26 +1,24 @@
 {
-  "name": "frontend",
+  "name": "hotel.booking-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.12",
-    "@mui/material": "^5.15.12",
+    "@mui/material": "^5.15.14",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.86",
-    "@types/react": "^18.2.63",
-    "@types/react-big-calendar": "^1.8.9",
-    "@types/react-dom": "^18.2.20",
-    "axios": "^1.6.7",
+    "@types/node": "^16.18.91",
+    "@types/react": "^18.2.71",
+    "@types/react-dom": "^18.2.22",
     "react": "^18.2.0",
-    "react-big-calendar": "^1.11.1",
+    "react-big-calendar": "^1.11.2",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.3",
     "react-scripts": "5.0.1",
+    "styled-components": "^6.1.8",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
@@ -49,6 +47,6 @@
     ]
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.1"
+    "@types/react-big-calendar": "^1.8.9"
   }
 }

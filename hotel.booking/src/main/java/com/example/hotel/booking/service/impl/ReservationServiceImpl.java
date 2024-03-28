@@ -25,8 +25,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public Reservation addNewReservation(Reservation reservation) {
         Reservation newReservation = new Reservation();
-        Optional.ofNullable(reservation.getDateIn()).ifPresent(newReservation::setDateIn);
-        Optional.ofNullable(reservation.getDateOut()).ifPresent(newReservation::setDateOut);
+        Optional.ofNullable(reservation.getStart()).ifPresent(newReservation::setStart);
+        Optional.ofNullable(reservation.getFinish()).ifPresent(newReservation::setFinish);
         Optional.ofNullable(reservation.getUser()).ifPresent(newReservation::setUser);
         Optional.ofNullable(reservation.getRoom()).ifPresent(newReservation::setRoom);
 

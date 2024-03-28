@@ -17,6 +17,7 @@ import UserService from "../../services/UserService";
 import { User } from "../../types/user.type";
 import AddUserComponent from "./AddUserComponent";
 import CloseIcon from "@mui/icons-material/Close";
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NavBar from "../Layout/NavBar";
 
 function UserComponent() {
@@ -44,6 +45,7 @@ function UserComponent() {
 
   return (
     <div>
+      <NavBar/>
       <Paper className="mt-2">
       <div className="mx-3 mb-2">
       <Button variant="outlined" color="success" onClick={openModal}>Add User</Button>
