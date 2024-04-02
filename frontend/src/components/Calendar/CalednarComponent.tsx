@@ -5,11 +5,14 @@ import { useEffect, useState } from "react";
 import ReservationService from "../../services/ReservationService";
 import { Box, IconButton, Modal } from "@mui/material";
 import AddReservationComponent from "../Reservation/AddReservationComponent";
+import { SlotInfo } from "react-big-calendar";
+import dayjs, { Dayjs } from "dayjs";
 
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ start: Dayjs, end: Dayjs} | null>(null);
 
   useEffect(() => {
     ReservationService.getReservationList().then((data) =>
@@ -23,11 +26,9 @@ export default function CalendarComponent() {
     title: reservation.user.firstName,
   }));
 
-  const handleSelectEvent = (event: any) => {
-    console.log("Selected event:");
-  };
-
-  const openModal = () => {
+  const openModal = ({ start, end }: { start: any, end: any }) => {
+    console.log("slot select: ", start, end);
+    setSelectedSlot({ start: dayjs(start), end: dayjs(end) });
     setIsModalOpen(true);
   };
 
@@ -43,7 +44,7 @@ export default function CalendarComponent() {
         events={events}
         defaultView="week"
         selectable
-        onSelectSlot={openModal}
+        onSelectSlot={ openModal }
       />
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box
@@ -67,7 +68,7 @@ export default function CalendarComponent() {
             }}
           >
           </IconButton>
-          <AddReservationComponent reservationToUpdate={selectedReservation!} onClose={closeModal} />
+          <AddReservationComponent start={dayjs(selectedSlot?.start).toDate()} end={dayjs(selectedSlot?.end).toDate()} reservationToUpdate={selectedReservation!} onClose={closeModal} />
         </Box>
       </Modal>
     </div>

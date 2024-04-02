@@ -31,6 +31,11 @@ function NavBar(props: Props) {
       onClick: () => navigate("/calendar"),
     },
     {
+      id:6,
+      text: "CalendarView",
+      onClick: () => navigate("/calendar-view"),
+    },
+    {
       id:3,
       text: "Users",
       onClick: () => navigate("/user"),

@@ -113,7 +113,7 @@ export default function ReservationComponent() {
             }}
           >
           </IconButton>
-          <AddReservationComponent reservationToUpdate={selectedReservation!} onClose={closeModal} />
+          <AddReservationComponent start={new Date()} end={new Date()} reservationToUpdate={selectedReservation!} onClose={closeModal} />
         </Box>
       </Modal>
     </>
