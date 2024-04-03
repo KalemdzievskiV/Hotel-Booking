@@ -24,10 +24,22 @@ public class ReservationController {
         return new ResponseEntity<>(newReservation, HttpStatus.CREATED);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<Reservation> updateReservation(@RequestBody Reservation reservation){
+        Reservation newReservation = reservationService.updateReservation(reservation);
+        return new ResponseEntity<>(newReservation, HttpStatus.OK);
+    }
+
     @GetMapping("/find/{id}")
     public ResponseEntity<Reservation> getReservationById(@PathVariable("id") Long id){
         Reservation reservation = reservationService.getReservationById(id);
         return new ResponseEntity<>(reservation, HttpStatus.OK);
+    }
+
+    @GetMapping("/find/room/{id}")
+    public ResponseEntity<List<Reservation>> getReservationByRoomId(@PathVariable("id") Long id){
+        List<Reservation> reservations = reservationService.getReservationByRoomId(id);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
     @GetMapping("/list")

@@ -1,7 +1,6 @@
 package com.example.hotel.booking.service.impl;
 
 import com.example.hotel.booking.entity.Reservation;
-import com.example.hotel.booking.entity.Room;
 import com.example.hotel.booking.repository.ReservationRepository;
 import com.example.hotel.booking.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +34,25 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public Reservation updateReservation(Reservation reservation) {
+        Reservation newReservation = reservationRepository.findById(reservation.getId()).orElse(null);
+        Optional.ofNullable(reservation.getStart()).ifPresent(newReservation::setStart);
+        Optional.ofNullable(reservation.getFinish()).ifPresent(newReservation::setFinish);
+        Optional.ofNullable(reservation.getUser()).ifPresent(newReservation::setUser);
+        Optional.ofNullable(reservation.getRoom()).ifPresent(newReservation::setRoom);
+
+        reservationRepository.save(newReservation);
+        return newReservation;
+    }
+
+    @Override
     public Reservation getReservationById(Long id) {
         return reservationRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Reservation> getReservationByRoomId(Long id) {
+        return reservationRepository.findReservationsByRoomId(id);
     }
 
     @Override

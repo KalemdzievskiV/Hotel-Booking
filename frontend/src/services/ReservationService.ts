@@ -23,7 +23,10 @@ static async getReservationById(id: number) {
     return response.data;
 }
 
-
+static async getReservationByRoomId(id: number) {
+    const response = await axios.get(`${BASE_URL}/reservation/find/room/${id}`);
+    return response.data;
+}
 
 }
 export default ReservationService;

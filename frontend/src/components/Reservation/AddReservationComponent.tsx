@@ -5,7 +5,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
   Typography,
 } from "@mui/material";
 import ReservationService from "../../services/ReservationService";
@@ -13,9 +12,12 @@ import { User } from "../../types/user.type";
 import { Room } from "../../types/room.type";
 import UserService from "../../services/UserService";
 import RoomService from "../../services/RoomService";
-import { DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
+import {
+  DateTimePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 interface AddReservationComponentProps {
   onClose: () => void;
@@ -96,6 +98,21 @@ export default function AddReservationComponent({
   };
 
   const handleAddReservation = () => {
+    if (
+      !reservation.start ||
+      !reservation.finish ||
+      !reservation.user.id ||
+      !reservation.room.id
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
+    reservation.start = new Date(
+      dayjs(reservation.start).format("YYYY-MM-DDTHH:mm:ss+00:00")
+    );
+    reservation.finish = new Date(
+      dayjs(reservation.finish).format("YYYY-MM-DDTHH:mm:ss+00:00")
+    );
     ReservationService.createNewReservation(reservation);
     // After successful addition, close the modal and refresh the page
     onClose();
@@ -103,6 +120,15 @@ export default function AddReservationComponent({
   };
 
   const handleEditReservation = () => {
+    if (
+      !reservation.start ||
+      !reservation.finish ||
+      !reservation.user.id ||
+      !reservation.room.id
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
     ReservationService.updateReservation(reservation);
     // After successful update, close the modal and refresh the page
     onClose();
@@ -115,38 +141,32 @@ export default function AddReservationComponent({
         {isEditing ? "Edit Reservation" : "Add Reservation"}
       </Typography>
       <form>
-        {/* <TextField
-          label="Start"
-          type="datetime-local"
-          name="start"
-          value={reservation.start}
-          onChange={handleChange}
-          fullWidth
-          style={{ marginBottom: "1rem" }}
-        />
-        <TextField
-          label="Finish"
-          type="datetime-local"
-          name="finish"
-          value={reservation.finish}
-          onChange={handleChange}
-          fullWidth
-          style={{ marginBottom: "1rem" }}
-        /> */}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
+            sx={{ marginBottom: "1rem", width: "100%" }}
             value={dayjs(reservation.start)}
             label="Start"
+            onChange={(value) =>
+              setReservation({ ...reservation, start: value?.toDate()! }) as any
+            }
           />
           <DateTimePicker
+            sx={{ marginBottom: "1rem", width: "100%" }}
             value={dayjs(reservation.finish)}
             label="Finish"
+            onChange={(value) =>
+              setReservation({
+                ...reservation,
+                finish: value?.toDate()!,
+              }) as any
+            }
           />
         </LocalizationProvider>
-        <InputLabel id="demo-simple-select-label">User</InputLabel>
+        <InputLabel id="select-user">User</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
+          required
+          labelId="select-user"
+          id="select-user"
           value={reservation.user.id}
           label="User"
           placeholder="Select User"
@@ -162,10 +182,11 @@ export default function AddReservationComponent({
             </MenuItem>
           ))}
         </Select>
-        <InputLabel id="demo-simple-select-label">Room</InputLabel>
+        <InputLabel id="select-room">Room</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
+          required
+          labelId="select-room"
+          id="select-room"
           value={reservation.room.id}
           label="Room"
           placeholder="Select Room"
@@ -184,9 +205,10 @@ export default function AddReservationComponent({
         <Button
           variant="contained"
           color="primary"
+          type="submit"
           onClick={isEditing ? handleEditReservation : handleAddReservation}
         >
-          {isEditing ? "Update Reservation" : "Add Reservation"}
+          {isEditing ? "Edit Reservation" : "Add Reservation"}
         </Button>
       </form>
     </div>

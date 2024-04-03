@@ -79,7 +79,7 @@ export default function ReservationComponent() {
         </TableHead>
         <TableBody>
           {reservations.map((reservation) => (
-            <StyledTableRow key={reservation.id}>
+            <StyledTableRow key={reservation.id} onDoubleClick={() => editReservation(reservation)}>
               <StyledTableCell component="th" scope="row">
                 {reservation.start.toString()}
               </StyledTableCell>

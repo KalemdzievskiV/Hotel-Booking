@@ -7,28 +7,27 @@ import { Box, IconButton, Modal } from "@mui/material";
 import AddReservationComponent from "../Reservation/AddReservationComponent";
 import { SlotInfo } from "react-big-calendar";
 import dayjs, { Dayjs } from "dayjs";
+import Filter from "../Layout/Filter";
 
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<{ start: Dayjs, end: Dayjs} | null>(null);
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
 
   useEffect(() => {
     ReservationService.getReservationList().then((data) =>
       setReservations(data)
     );
-  });
+  }, []);
 
-  const events = reservations.map((reservation) => ({
-    start: new Date(reservation.start),
-    end: new Date(reservation.finish),
-    title: reservation.user.firstName,
-  }));
-
-  const openModal = ({ start, end }: { start: any, end: any }) => {
+  const openModal = ({ start, end }: SlotInfo) => {
     console.log("slot select: ", start, end);
-    setSelectedSlot({ start: dayjs(start), end: dayjs(end) });
+    setSelectedSlot({ start, end });
     setIsModalOpen(true);
   };
 
@@ -37,14 +36,44 @@ export default function CalendarComponent() {
     setIsModalOpen(false);
   };
 
+  const handleFilterChange = (selectedValue: number) => {
+    if (
+      selectedValue === undefined ||
+      selectedValue === 0 ||
+      selectedValue === -1 ||
+      selectedValue === null
+    ) {
+      ReservationService.getReservationList().then((data) =>
+        setReservations(data)
+      );
+      return;
+    } else {
+      ReservationService.getReservationByRoomId(selectedValue).then((data) =>
+        setReservations(data)
+      );
+    }
+  };
+
+  const events = reservations.map((reservation) => ({
+    start: new Date(reservation.start),
+    end: new Date(reservation.finish),
+    title:
+      "Room: " +
+      reservation.room.number +
+      " - User: " +
+      reservation.user.firstName,
+  }));
+
   return (
     <div>
       <NavBar />
+      <Filter title="Room" service="room" onChange={handleFilterChange} />
       <Calendar
+        style={{ marginTop: 20 }}
         events={events}
         defaultView="week"
         selectable
-        onSelectSlot={ openModal }
+        onSelectSlot={openModal}
       />
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box
@@ -66,9 +95,13 @@ export default function CalendarComponent() {
               top: "8px",
               right: "8px",
             }}
-          >
-          </IconButton>
-          <AddReservationComponent start={dayjs(selectedSlot?.start).toDate()} end={dayjs(selectedSlot?.end).toDate()} reservationToUpdate={selectedReservation!} onClose={closeModal} />
+          ></IconButton>
+          <AddReservationComponent
+            start={dayjs(selectedSlot?.start).toDate()}
+            end={dayjs(selectedSlot?.end).toDate()}
+            reservationToUpdate={selectedReservation!}
+            onClose={closeModal}
+          />
         </Box>
       </Modal>
     </div>
