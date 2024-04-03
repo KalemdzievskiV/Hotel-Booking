@@ -1,6 +1,7 @@
 package com.example.hotel.booking.controller;
 
 import com.example.hotel.booking.entity.Room;
+import com.example.hotel.booking.enums.RoomStatusEnum;
 import com.example.hotel.booking.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,13 +35,19 @@ public class RoomController {
         return new ResponseEntity<>(room, HttpStatus.OK);
     }
 
+    @GetMapping("/find/status/{status}")
+    public ResponseEntity<List<Room>> getRoomByStatus(@PathVariable("status") RoomStatusEnum status) {
+        List<Room> rooms = roomService.getRoomByStatus(status);
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
     @GetMapping("/list")
     public ResponseEntity<List<Room>> getAllRooms() {
         List<Room> rooms = roomService.getRoomList();
         return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
-    @GetMapping("/find/{number}")
+    @GetMapping("/find//number/{number}")
     public ResponseEntity<Room> getRoomByNumber(@PathVariable("number") String number) {
         Room room = roomService.getRoomByNumber(number);
         return new ResponseEntity<>(room, HttpStatus.OK);

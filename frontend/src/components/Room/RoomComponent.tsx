@@ -13,6 +13,7 @@ import RoomService from "../../services/RoomService";
 import { Room } from "../../types/room.type";
 import { Box, Button, IconButton, Modal } from "@mui/material";
 import AddRoomComponent from "./AddRoomComponent";
+import RoomStatus from "../../enum/room/room.status.enum";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -56,6 +57,7 @@ export default function RoomComponent() {
     setIsModalOpen(true);
     setSelectedRoom(room); // Set the selected room
   };
+
   return (
     <>
       <NavBar />

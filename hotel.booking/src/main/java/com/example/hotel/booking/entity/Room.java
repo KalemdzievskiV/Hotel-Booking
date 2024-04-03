@@ -1,5 +1,6 @@
 package com.example.hotel.booking.entity;
 
+import com.example.hotel.booking.enums.RoomStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,8 @@ public class Room {
     private Long id;
     private String number;
     private String name;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private RoomStatusEnum status;
     private String description;
     private Integer maxCapacity;
 }

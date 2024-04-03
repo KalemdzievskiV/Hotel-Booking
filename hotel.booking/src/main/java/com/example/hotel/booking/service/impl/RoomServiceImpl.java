@@ -1,6 +1,7 @@
 package com.example.hotel.booking.service.impl;
 
 import com.example.hotel.booking.entity.Room;
+import com.example.hotel.booking.enums.RoomStatusEnum;
 import com.example.hotel.booking.repository.RoomRepository;
 import com.example.hotel.booking.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,11 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Room getRoomByNumber(String number) {
         return roomRepository.findRoomByNumber(number);
+    }
+
+    @Override
+    public List<Room> getRoomByStatus(RoomStatusEnum status) {
+        return roomRepository.findByStatus(status);
     }
 
     @Override

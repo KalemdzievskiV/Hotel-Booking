@@ -18,6 +18,11 @@ static async getRoomByNumber(number: number) {
     return response.data;
 }
 
+static async getRoomByStatus(status: string) {
+    const response = await axios.get(`${BASE_URL}/room/find/status/${status}`);
+    return response.data;
+}
+
 static async createNewRoom(room: any) {
     const response = await axios.post(`${BASE_URL}/room/add`, room);
     return response.data;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, MenuItem, TextField, Typography } from "@mui/material";
 import RoomService from "../../services/RoomService";
+import UserRole from "../../enum/user.enum";
+import RoomStatus from "../../enum/room/room.status.enum";
 
 interface AddRoomComponentProps {
   onClose: () => void;
@@ -80,12 +82,22 @@ export default function AddRoomComponent({
         <TextField
           name="status"
           label="Status"
-          type="text"
+          select
           value={room.status}
           onChange={handleChange}
           fullWidth
           margin="normal"
-        />
+        >
+          {Object.values(RoomStatus).map((status) => (
+            <MenuItem
+              defaultValue={RoomStatus.AVAILABLE}
+              key={status}
+              value={status}
+            >
+              {status}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
           name="description"
           label="Description"
