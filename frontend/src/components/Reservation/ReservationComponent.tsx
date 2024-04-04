@@ -1,18 +1,22 @@
 import NavBar from "../Layout/NavBar";
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import * as React from "react";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
 import ReservationService from "../../services/ReservationService";
 import { Reservation } from "../../types/reservation.type";
 import { Box, Button, IconButton, Modal } from "@mui/material";
 import AddReservationComponent from "./AddReservationComponent";
+import RoomStatus from "../../enum/room/room.status.enum";
+import RoomService from "../../services/RoomService";
+import moment from "moment";
+import { Room } from "../../types/room.type";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -25,73 +29,133 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
+  "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
   // hide last border
-  '&:last-child td, &:last-child th': {
+  "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
 
 export default function ReservationComponent() {
-    const [reservations, setReservations] = useState<Reservation[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [reservationsByRoom, setReservationsByRoom] = useState<Reservation[]>(
+    []
+  );
 
-    useEffect(() => {
-        ReservationService.getReservationList().then((data) => setReservations(data));
-    }, []);
+  useEffect(() => {
+    ReservationService.getReservationList().then((data) =>
+      setReservations(data)
+    );
+    RoomService.getRoomList().then((data) => setRooms(data));
+    changeStatus();
+  }, []);
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
 
-    const closeModal = () => {
-        setSelectedReservation(null);
-        setIsModalOpen(false);
-    };
+  const closeModal = () => {
+    setSelectedReservation(null);
+    setIsModalOpen(false);
+  };
 
-    const editReservation = (reservation: Reservation) => {
-        setIsModalOpen(true);
-        setSelectedReservation(reservation); // Set the selected reservation
-    };
+  const editReservation = (reservation: Reservation) => {
+    setIsModalOpen(true);
+    setSelectedReservation(reservation); // Set the selected reservation
+  };
 
-    useEffect(() => {
-        ReservationService.getReservationList().then((data) => setReservations(data));
-    }, [])
+  const handleRoomReservations = (room: Room) => {
+    ReservationService.getReservationByRoomId(room.id).then((data) => {
+      setReservationsByRoom(data);
+    });
+  };
+
+  const reservationHappeningNow = (reservations: Reservation[]) => {
+    const happeningNowReservations: Reservation[] = []; // Declare happeningNowReservations as an empty array
+    reservations.forEach((reservation) => {
+      const currentDateTime = moment(); // Get the current date and time using moment
+      if (
+        moment(reservation.start).isSameOrBefore(currentDateTime) &&
+        moment(reservation.finish).isAfter(currentDateTime)
+      ) {
+        happeningNowReservations.push(reservation); // Push the reservation into happeningNowReservations
+      }
+    });
+    return happeningNowReservations; // Return happeningNowReservations
+  };
+
+  const changeStatus = () => {
+    let reservationsNow: Reservation[] = [];
+    rooms.forEach((room) => {
+      handleRoomReservations(room);
+      reservationsNow = reservationHappeningNow(reservationsByRoom);
+      if (room.status !== RoomStatus.OCCUPIED && reservationsNow.length > 0) {
+        room.status = RoomStatus.OCCUPIED;
+        RoomService.updateRoom(room).then(() => {
+          console.log("Room status updated");
+        });
+      } else if (
+        room.status === RoomStatus.OCCUPIED &&
+        reservationsNow.length === 0
+      ) {
+        room.status = RoomStatus.AVAILABLE;
+        RoomService.updateRoom(room).then(() => {
+          console.log("Room status updated");
+        });
+      }
+    });
+  };
+
+  setInterval(changeStatus, 1000 * 60 * 1, reservations); // Update the status of the reservation every 5min (1000ms * 60s * 5m = 5min)
 
   return (
     <>
-    <NavBar/>
-    <div className="mx-3 mb-2">
-      <Button variant="outlined" color="success" onClick={openModal}>Add Reservation</Button>
-    </div>
-    <TableContainer component={Paper} className="w-fit">
-      <Table  aria-label="customized table" >
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Start</StyledTableCell>
-            <StyledTableCell align="right">End</StyledTableCell>
-            <StyledTableCell align="right">User</StyledTableCell>
-            <StyledTableCell align="right">Room</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {reservations.map((reservation) => (
-            <StyledTableRow key={reservation.id} onDoubleClick={() => editReservation(reservation)}>
-              <StyledTableCell component="th" scope="row">
-                {reservation.start.toString()}
-              </StyledTableCell>
-              <StyledTableCell align="right">{reservation.finish.toString()}</StyledTableCell>
-              <StyledTableCell align="right">{reservation.user.firstName}</StyledTableCell>
-              <StyledTableCell align="right">{reservation.room.description}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <Modal open={isModalOpen} onClose={closeModal}>
+      <NavBar />
+      <div className="mx-3 mb-2">
+        <Button variant="outlined" color="success" onClick={openModal}>
+          Add Reservation
+        </Button>
+      </div>
+      <TableContainer component={Paper} className="w-fit">
+        <Table aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Start</StyledTableCell>
+              <StyledTableCell align="right">End</StyledTableCell>
+              <StyledTableCell align="right">User</StyledTableCell>
+              <StyledTableCell align="right">Room</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {reservations.map((reservation) => (
+              <StyledTableRow
+                key={reservation.id}
+                onDoubleClick={() => editReservation(reservation)}
+              >
+                <StyledTableCell component="th" scope="row">
+                  {reservation.start.toString()}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {reservation.finish.toString()}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {reservation.user.firstName}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {reservation.room.description}
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Modal open={isModalOpen} onClose={closeModal}>
         <Box
           sx={{
             position: "absolute",
@@ -111,9 +175,13 @@ export default function ReservationComponent() {
               top: "8px",
               right: "8px",
             }}
-          >
-          </IconButton>
-          <AddReservationComponent start={new Date()} end={new Date()} reservationToUpdate={selectedReservation!} onClose={closeModal} />
+          ></IconButton>
+          <AddReservationComponent
+            start={new Date()}
+            end={new Date()}
+            reservationToUpdate={selectedReservation!}
+            onClose={closeModal}
+          />
         </Box>
       </Modal>
     </>

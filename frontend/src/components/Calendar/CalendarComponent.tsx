@@ -62,8 +62,24 @@ export default function CalendarComponent() {
       reservation.room.number +
       " - User: " +
       reservation.user.firstName,
+    style: {
+      backgroundColor: 'red',
+      color: "white",
+    }
+    
   }));
-
+  const eventStyleGetter = (event: any, start: any, end: any, isSelected: any) => {
+    var backgroundColor = "red";
+    var style = {
+        backgroundColor: backgroundColor,
+        borderRadius: '0px',
+        border: '0px',
+        display: 'block'
+    };
+    return {
+        style: style
+    };
+  }
   return (
     <div>
       <NavBar />
@@ -74,6 +90,7 @@ export default function CalendarComponent() {
         defaultView="week"
         selectable
         onSelectSlot={openModal}
+        eventPropGetter={eventStyleGetter}
       />
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box
