@@ -13,10 +13,8 @@ import ReservationService from "../../services/ReservationService";
 import { Reservation } from "../../types/reservation.type";
 import { Box, Button, IconButton, Modal } from "@mui/material";
 import AddReservationComponent from "./AddReservationComponent";
-import RoomStatus from "../../enum/room/room.status.enum";
-import RoomService from "../../services/RoomService";
 import moment from "moment";
-import { Room } from "../../types/room.type";
+import ReservationStatus from "../../enum/reservation/reservation.status.enum";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -43,16 +41,9 @@ export default function ReservationComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] =
     useState<Reservation | null>(null);
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [reservationsByRoom, setReservationsByRoom] = useState<Reservation[]>(
-    []
-  );
 
   useEffect(() => {
-    ReservationService.getReservationList().then((data) =>
-      setReservations(data)
-    );
-    RoomService.getRoomList().then((data) => setRooms(data));
+    getReservationList(); // Call initially to fetch reservation list
     changeStatus();
   }, []);
 
@@ -70,49 +61,45 @@ export default function ReservationComponent() {
     setSelectedReservation(reservation); // Set the selected reservation
   };
 
-  const handleRoomReservations = (room: Room) => {
-    ReservationService.getReservationByRoomId(room.id).then((data) => {
-      setReservationsByRoom(data);
-    });
+  const getReservationList = async () => {
+    const data = await ReservationService.getReservationList();
+    setReservations(data);
+  }
+
+  const changeStatus = async () => {
+    console.log("Changing reservation status");
+    await getReservationList();
+    if (reservations.length > 0) {
+      reservations.forEach((reservation) => {
+        const currentDateTime = moment();
+        if (
+          moment(reservation.start).isSameOrBefore(currentDateTime) &&
+          moment(reservation.finish).isAfter(currentDateTime)
+        ) {
+          reservation.status = ReservationStatus.ACTIVE;
+            ReservationService.updateReservation(
+              reservation
+            ).then(() => {
+              console.log("Reservation status updated");
+            });
+        } else if (
+          reservation.status === ReservationStatus.ACTIVE &&
+          moment(reservation.finish).isBefore(currentDateTime)
+        ) {
+          reservation.status = ReservationStatus.COMPLETED;
+            ReservationService.updateReservation(
+              reservation
+            ).then(() => {
+              console.log("Reservation status updated");
+            });
+        }
+
+      });
+    }
   };
 
-  const reservationHappeningNow = (reservations: Reservation[]) => {
-    const happeningNowReservations: Reservation[] = []; // Declare happeningNowReservations as an empty array
-    reservations.forEach((reservation) => {
-      const currentDateTime = moment(); // Get the current date and time using moment
-      if (
-        moment(reservation.start).isSameOrBefore(currentDateTime) &&
-        moment(reservation.finish).isAfter(currentDateTime)
-      ) {
-        happeningNowReservations.push(reservation); // Push the reservation into happeningNowReservations
-      }
-    });
-    return happeningNowReservations; // Return happeningNowReservations
-  };
-
-  const changeStatus = () => {
-    let reservationsNow: Reservation[] = [];
-    rooms.forEach((room) => {
-      handleRoomReservations(room);
-      reservationsNow = reservationHappeningNow(reservationsByRoom);
-      if (room.status !== RoomStatus.OCCUPIED && reservationsNow.length > 0) {
-        room.status = RoomStatus.OCCUPIED;
-        RoomService.updateRoom(room).then(() => {
-          console.log("Room status updated");
-        });
-      } else if (
-        room.status === RoomStatus.OCCUPIED &&
-        reservationsNow.length === 0
-      ) {
-        room.status = RoomStatus.AVAILABLE;
-        RoomService.updateRoom(room).then(() => {
-          console.log("Room status updated");
-        });
-      }
-    });
-  };
-
-  setInterval(changeStatus, 1000 * 60 * 1, reservations); // Update the status of the reservation every 5min (1000ms * 60s * 5m = 5min)
+  //changeStatus();
+  setInterval(changeStatus, 1000 * 30);
 
   return (
     <>

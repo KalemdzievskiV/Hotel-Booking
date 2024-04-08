@@ -1,5 +1,6 @@
 package com.example.hotel.booking.entity;
 
+import com.example.hotel.booking.enums.ReservationStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Reservation {
     private Long id;
     private LocalDateTime start;
     private LocalDateTime finish;
+    private ReservationStatusEnum status;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

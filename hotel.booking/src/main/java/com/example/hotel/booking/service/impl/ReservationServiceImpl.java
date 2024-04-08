@@ -1,6 +1,7 @@
 package com.example.hotel.booking.service.impl;
 
 import com.example.hotel.booking.entity.Reservation;
+import com.example.hotel.booking.enums.ReservationStatusEnum;
 import com.example.hotel.booking.repository.ReservationRepository;
 import com.example.hotel.booking.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation newReservation = new Reservation();
         Optional.ofNullable(reservation.getStart()).ifPresent(newReservation::setStart);
         Optional.ofNullable(reservation.getFinish()).ifPresent(newReservation::setFinish);
+        if (reservation.getStatus() == null){
+            newReservation.setStatus(ReservationStatusEnum.BOOKED);
+        } else {
+            newReservation.setStatus(reservation.getStatus());
+        }
         Optional.ofNullable(reservation.getUser()).ifPresent(newReservation::setUser);
         Optional.ofNullable(reservation.getRoom()).ifPresent(newReservation::setRoom);
 
@@ -38,6 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation newReservation = reservationRepository.findById(reservation.getId()).orElse(null);
         Optional.ofNullable(reservation.getStart()).ifPresent(newReservation::setStart);
         Optional.ofNullable(reservation.getFinish()).ifPresent(newReservation::setFinish);
+        Optional.ofNullable(reservation.getStatus()).ifPresent(newReservation::setStatus);
         Optional.ofNullable(reservation.getUser()).ifPresent(newReservation::setUser);
         Optional.ofNullable(reservation.getRoom()).ifPresent(newReservation::setRoom);
 

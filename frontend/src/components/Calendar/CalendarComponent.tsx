@@ -8,6 +8,7 @@ import AddReservationComponent from "../Reservation/AddReservationComponent";
 import { SlotInfo } from "react-big-calendar";
 import dayjs, { Dayjs } from "dayjs";
 import Filter from "../Layout/Filter";
+import ReservationStatus from "../../enum/reservation/reservation.status.enum";
 
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -62,14 +63,14 @@ export default function CalendarComponent() {
       reservation.room.number +
       " - User: " +
       reservation.user.firstName,
-    style: {
-      backgroundColor: 'red',
-      color: "white",
-    }
-    
+    color:  
+      reservation.status === ReservationStatus.ACTIVE ? "green" :
+      reservation.status === ReservationStatus.COMPLETED ? "yellow" :
+      reservation.status === ReservationStatus.CANCELED ? "red" : "blue",
   }));
+  
   const eventStyleGetter = (event: any, start: any, end: any, isSelected: any) => {
-    var backgroundColor = "red";
+    var backgroundColor = event.color;
     var style = {
         backgroundColor: backgroundColor,
         borderRadius: '0px',
