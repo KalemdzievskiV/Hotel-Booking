@@ -14,12 +14,18 @@ import RoomService from "../services/RoomService";
 import RoomStatus from "../enum/room/room.status.enum";
 import { Reservation } from "../types/reservation.type";
 import ReservationService from "../services/ReservationService";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import moment from "moment";
+
 
 function HomepageComponent() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const currentTime = new Date();
   const [title , setTitle] = useState<string>("All Available Rooms");
+  const [selectedTime, setSelectedTime] = useState<Date>(new Date());
 
   useEffect(() => {
     RoomService.getRoomByStatus(RoomStatus.AVAILABLE).then((data) =>
@@ -50,6 +56,13 @@ function HomepageComponent() {
     }
   }
 
+  const getAvailableRoomsCustom = async (selectedTime: Date) => {
+    selectedTime = new Date(dayjs(selectedTime).format("YYYY-MM-DDTHH:mm:ss+00:00"));
+    const fiveHoursFromSelectedTime = new Date(selectedTime.getTime() + 5 * 60 * 60 * 1000);
+    getAvailableRooms(fiveHoursFromSelectedTime);
+    setTitle("All Available Rooms in 5 hours from " + dayjs(selectedTime).subtract(dayjs(selectedTime).utcOffset(), 'minute').format("HH:mm:ss"));
+  }
+
   const getAvailableRoomsInFiveHours = async () => {
     const fiveHoursFromNow = new Date(currentTime.getTime() + 5 * 60 * 60 * 1000);
     getAvailableRooms(fiveHoursFromNow);
@@ -62,6 +75,10 @@ function HomepageComponent() {
     setTitle("All Available Rooms in 1 day");
   }
 
+  const redirectToCalendar = (roomId: number) => {
+    window.location.href = `/calendar?roomId=${roomId}`;
+  }
+
   return (
     <div className="w-full mx-auto bg-white">
       <NavBar />
@@ -69,6 +86,10 @@ function HomepageComponent() {
         <Grid item xs={12} className="text-left">
           <Button onClick={getAvailableRoomsInFiveHours}>Available in 5 hours</Button>
           <Button onClick={getAvailableRoomsInOneDay}>Available in 1 day</Button>
+          <LocalizationProvider dateAdapter={AdapterDayjs} >
+          <DateTimePicker value={dayjs(selectedTime)} onChange={(value) => setSelectedTime(value?.toDate()!)} />
+          </LocalizationProvider>
+          <Button onClick={() => getAvailableRoomsCustom(selectedTime)}>Available in custom range</Button>
         </Grid>
         <Grid item xs={12} className="text-center">
           <h1 className="text-4xl font-bold">{title}</h1>
@@ -100,9 +121,8 @@ function HomepageComponent() {
                     {room.description}
                   </Typography>
                 </CardContent>
-                <CardActions>
-                  <Button size="small">Share</Button>
-                  <Button size="small">Learn More</Button>
+                <CardActions sx={{justifyContent: "center", alignItems: "center"}}>
+                  <Button size="small" onClick={() => redirectToCalendar(room.id)}>Book Appointment</Button>
                 </CardActions>
               </Card>
             ))}

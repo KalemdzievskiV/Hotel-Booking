@@ -12,6 +12,7 @@ export interface FilterProps {
     title: string;
     service: string;
     onChange: (value: number) => void;
+    roomId: number | null;
 }
 
 export default function Filter(props: FilterProps) {
@@ -19,6 +20,7 @@ export default function Filter(props: FilterProps) {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedValue, setSelectedValue] = useState<number>(0);
+  const roomId = props.roomId;
   useEffect(() => {
     if (props.service === "room") {
       RoomService.getRoomList().then((data) => setRooms(data));
@@ -42,7 +44,7 @@ function handleChange(event : ChangeEvent<{ value: unknown }>) {
         <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={selectedValue}
+            value={roomId ? roomId : selectedValue}
             label="Filter"
             onChange={(event) => {
                 props.onChange(event?.target?.value as unknown as number);

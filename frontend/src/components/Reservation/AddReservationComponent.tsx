@@ -129,6 +129,12 @@ export default function AddReservationComponent({
       alert("Please fill in all fields");
       return;
     }
+    reservation.start = new Date(
+      dayjs(reservation.start).format("YYYY-MM-DDTHH:mm:ss+00:00")
+    );
+    reservation.finish = new Date(
+      dayjs(reservation.finish).format("YYYY-MM-DDTHH:mm:ss+00:00")
+    );
     ReservationService.updateReservation(reservation);
     // After successful update, close the modal and refresh the page
     onClose();

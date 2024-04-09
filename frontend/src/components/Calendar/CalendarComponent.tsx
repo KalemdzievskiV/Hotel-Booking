@@ -9,6 +9,7 @@ import { SlotInfo } from "react-big-calendar";
 import dayjs, { Dayjs } from "dayjs";
 import Filter from "../Layout/Filter";
 import ReservationStatus from "../../enum/reservation/reservation.status.enum";
+import { useLocation, useParams } from "react-router-dom";
 
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -19,11 +20,20 @@ export default function CalendarComponent() {
     start: Date;
     end: Date;
   } | null>(null);
+  const [roomId, setRoomId] = useState<number | null>(null);
+  const location = useLocation();
+
+  
 
   useEffect(() => {
     ReservationService.getReservationList().then((data) =>
       setReservations(data)
     );
+    const searchParams = new URLSearchParams(location.search);
+    const roomId = searchParams.get('roomId');
+    setRoomId(roomId ? parseInt(roomId) : null);
+    console.log('Room ID:', roomId);
+    handleFilterChange(roomId ? parseInt(roomId) : -1);
   }, []);
 
   const openModal = ({ start, end }: SlotInfo) => {
@@ -32,15 +42,27 @@ export default function CalendarComponent() {
     setIsModalOpen(true);
   };
 
+  const openEditModal = (reservation: Reservation) => {
+    //setSelectedReservation(reservation);
+    console.log("reservation select: ", reservation);
+    setIsModalOpen(true);
+  }
+
   const closeModal = () => {
     setSelectedReservation(null);
     setIsModalOpen(false);
   };
 
   const handleFilterChange = (selectedValue: number) => {
-    if (
+    if ((selectedValue === undefined || selectedValue === -1 || selectedValue === null) && roomId !== null) {
+      selectedValue = roomId;
+      ReservationService.getReservationByRoomId(roomId).then((data) =>
+        setReservations(data)
+      );
+      return;
+    }
+    else if (
       selectedValue === undefined ||
-      selectedValue === 0 ||
       selectedValue === -1 ||
       selectedValue === null
     ) {
@@ -52,6 +74,7 @@ export default function CalendarComponent() {
       ReservationService.getReservationByRoomId(selectedValue).then((data) =>
         setReservations(data)
       );
+      setRoomId(selectedValue);
     }
   };
 
@@ -65,9 +88,11 @@ export default function CalendarComponent() {
       reservation.user.firstName,
     color:  
       reservation.status === ReservationStatus.ACTIVE ? "green" :
-      reservation.status === ReservationStatus.COMPLETED ? "yellow" :
+      reservation.status === ReservationStatus.COMPLETED ? "orange" :
       reservation.status === ReservationStatus.CANCELED ? "red" : "blue",
+
   }));
+  
   
   const eventStyleGetter = (event: any, start: any, end: any, isSelected: any) => {
     var backgroundColor = event.color;
@@ -76,6 +101,7 @@ export default function CalendarComponent() {
         borderRadius: '0px',
         border: '0px',
         display: 'block'
+        
     };
     return {
         style: style
@@ -84,14 +110,18 @@ export default function CalendarComponent() {
   return (
     <div>
       <NavBar />
-      <Filter title="Room" service="room" onChange={handleFilterChange} />
+      <Filter title="Room" service="room" onChange={handleFilterChange} roomId={roomId}/>
       <Calendar
         style={{ marginTop: 20 }}
         events={events}
         defaultView="week"
         selectable
         onSelectSlot={openModal}
+        onSelectEvent={(event, e) => reservations.map((reservation) => openEditModal(reservation))}
         eventPropGetter={eventStyleGetter}
+        allDayAccessor={() => false}
+        showMultiDayTimes
+        endAccessor={({ end }) => new Date((end ?? new Date()).getTime() - 1)}
       />
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box

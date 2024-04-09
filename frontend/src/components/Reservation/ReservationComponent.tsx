@@ -13,8 +13,6 @@ import ReservationService from "../../services/ReservationService";
 import { Reservation } from "../../types/reservation.type";
 import { Box, Button, IconButton, Modal } from "@mui/material";
 import AddReservationComponent from "./AddReservationComponent";
-import moment from "moment";
-import ReservationStatus from "../../enum/reservation/reservation.status.enum";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -43,8 +41,16 @@ export default function ReservationComponent() {
     useState<Reservation | null>(null);
 
   useEffect(() => {
-    getReservationList(); // Call initially to fetch reservation list
-    changeStatus();
+    ReservationService.getReservationList().then((data) => {
+      setReservations(data);
+    });
+    // getReservationList(); // Call initially to fetch reservation list
+    // changeStatus();
+    // const interval = setInterval(() => {
+    //   changeStatus();
+    // }
+    // , 1000 * 30);
+    // return () => clearInterval(interval);
   }, []);
 
   const openModal = () => {
@@ -61,45 +67,45 @@ export default function ReservationComponent() {
     setSelectedReservation(reservation); // Set the selected reservation
   };
 
-  const getReservationList = async () => {
-    const data = await ReservationService.getReservationList();
-    setReservations(data);
-  }
+  // const getReservationList = async () => {
+  //   const data = await ReservationService.getReservationList();
+  //   setReservations(data);
+  // }
 
-  const changeStatus = async () => {
-    console.log("Changing reservation status");
-    await getReservationList();
-    if (reservations.length > 0) {
-      reservations.forEach((reservation) => {
-        const currentDateTime = moment();
-        if (
-          moment(reservation.start).isSameOrBefore(currentDateTime) &&
-          moment(reservation.finish).isAfter(currentDateTime)
-        ) {
-          reservation.status = ReservationStatus.ACTIVE;
-            ReservationService.updateReservation(
-              reservation
-            ).then(() => {
-              console.log("Reservation status updated");
-            });
-        } else if (
-          reservation.status === ReservationStatus.ACTIVE &&
-          moment(reservation.finish).isBefore(currentDateTime)
-        ) {
-          reservation.status = ReservationStatus.COMPLETED;
-            ReservationService.updateReservation(
-              reservation
-            ).then(() => {
-              console.log("Reservation status updated");
-            });
-        }
+  // const changeStatus = async () => {
+  //   console.log("Changing reservation status");
+  //   await getReservationList();
+  //   if (reservations.length > 0) {
+  //     reservations.forEach((reservation) => {
+  //       const currentDateTime = moment();
+  //       if (
+  //         moment(reservation.start).isSameOrBefore(currentDateTime) &&
+  //         moment(reservation.finish).isAfter(currentDateTime)
+  //       ) {
+  //         reservation.status = ReservationStatus.ACTIVE;
+  //           ReservationService.updateReservation(
+  //             reservation
+  //           ).then(() => {
+  //             console.log("Reservation status updated");
+  //           });
+  //       } else if (
+  //         reservation.status === ReservationStatus.ACTIVE &&
+  //         moment(reservation.finish).isBefore(currentDateTime)
+  //       ) {
+  //         reservation.status = ReservationStatus.COMPLETED;
+  //           ReservationService.updateReservation(
+  //             reservation
+  //           ).then(() => {
+  //             console.log("Reservation status updated");
+  //           });
+  //       }
 
-      });
-    }
-  };
+  //     });
+  //   }
+  // };
 
   //changeStatus();
-  setInterval(changeStatus, 1000 * 30);
+  //setInterval(changeStatus, 1000 * 30);
 
   return (
     <>
