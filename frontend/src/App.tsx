@@ -14,19 +14,6 @@ function App() {
   const [rooms, setRooms] = useState<Room[]>([]);
 
   useEffect(() => {
-    // ReservationService.getReservationList().then((data) => {
-    //   setReservations(data);
-    // });
-    // RoomService.getRoomList().then((data) => {
-    //   setRooms(data);
-    // });
-    // changeReservationStatus();
-    // changeRoomStatus();
-    // const interval = setInterval(() => {
-    //   changeReservationStatus();
-    //   changeRoomStatus();
-    // }, 1000 * 30);
-    // return () => clearInterval(interval);
     const fetchData = async () => {
       const reservations = await ReservationService.getReservationList();
       setReservations(reservations);
@@ -37,29 +24,12 @@ function App() {
     };
     fetchData();
 
-  const interval = setInterval(fetchData, 1000 * 30);
+  const interval = setInterval(fetchData, 1000 * 60 * 3);
 
   return () => clearInterval(interval);
   }, []);
 
-  
-
-  const getReservationList = async () => {
-    const data = await ReservationService.getReservationList();
-    setReservations(data);
-    console.log("Reservations: ", reservations);
-  }
-
-  const getRoomList = async () => {
-    const data = await RoomService.getRoomList();
-    setRooms(data);
-    console.log("Rooms: ", rooms);
-  }
-
   const changeReservationStatus = async (reservations: Reservation[]) => {
-    console.log("Changing reservation status");
-    //await getReservationList();
-    console.log("Reservations: ", reservations);
     if (reservations.length > 0) {
       reservations.forEach((reservation) => {
         const currentDateTime = moment();
@@ -86,9 +56,6 @@ function App() {
   };
 
   const changeRoomStatus = async (rooms: Room[]) => {
-    console.log("Changing room status");
-    //await getRoomList();
-    console.log("Rooms: ", rooms);
     rooms.forEach(async (room) => {
       const reservations = await ReservationService.getReservationByRoomId(
         room.id

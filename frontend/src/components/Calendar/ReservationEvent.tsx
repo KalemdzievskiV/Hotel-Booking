@@ -3,11 +3,9 @@ import { Reservation } from "../../types/reservation.type";
 import ReservationStatus from "../../enum/reservation/reservation.status.enum";
 
 export default function AppointmentEvent({
-  appointment,
-  isMonthView,
+  appointment
 }: {
   appointment: Reservation;
-  isMonthView?: boolean;
 }) {
   const { start, finish, status } = appointment;
   const background = appointment.status === ReservationStatus.ACTIVE ? "green" : "red";
@@ -21,7 +19,7 @@ export default function AppointmentEvent({
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
-        height={isMonthView ? 100 : 150}
+        
     >
     <Typography alignItems={"center"} justifyContent="space-between">
         <Typography>

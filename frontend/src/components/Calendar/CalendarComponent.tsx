@@ -6,10 +6,11 @@ import ReservationService from "../../services/ReservationService";
 import { Box, IconButton, Modal } from "@mui/material";
 import AddReservationComponent from "../Reservation/AddReservationComponent";
 import { SlotInfo } from "react-big-calendar";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import Filter from "../Layout/Filter";
 import ReservationStatus from "../../enum/reservation/reservation.status.enum";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import AppointmentEvent from "./ReservationEvent";
 
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -112,7 +113,7 @@ export default function CalendarComponent() {
       <NavBar />
       <Filter title="Room" service="room" onChange={handleFilterChange} roomId={roomId}/>
       <Calendar
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 20, marginRight: 5, marginLeft: 5}}
         events={events}
         defaultView="week"
         selectable
