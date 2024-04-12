@@ -37,5 +37,11 @@ static async deleteUser(id: number) {
     const response = await axios.delete(`${BASE_URL}/room/delete/${id}`);
     return response.data;
 }
+
+static async getAvailableRoomsInDateRange(selectedTime: String) {
+    const response = await axios.get(`${BASE_URL}/room/find/available/${selectedTime}`);
+    return response.data;
+}
+
 }
 export default RoomService;

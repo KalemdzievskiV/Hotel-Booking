@@ -8,11 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/room")
 public class RoomController {
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private RoomService roomService;
 
     @Autowired
@@ -56,5 +59,11 @@ public class RoomController {
     @DeleteMapping("/delete/{id}")
     public void deleteRoom(@PathVariable("id") Long id) {
         roomService.deleteRoom(id);
+    }
+
+    @GetMapping("/find/available/{selectedTime}")
+    public ResponseEntity<List<Room>> getAvailableRoomsInDateRange(@PathVariable("selectedTime") String selectedTime) {
+        List<Room> rooms = roomService.getAvailableRoomsInDateRange(LocalDateTime.parse(selectedTime, formatter));
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 }

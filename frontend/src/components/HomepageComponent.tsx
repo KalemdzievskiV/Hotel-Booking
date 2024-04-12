@@ -57,11 +57,40 @@ function HomepageComponent() {
   }
 
   const getAvailableRoomsCustom = async (selectedTime: Date) => {
-    selectedTime = new Date(dayjs(selectedTime).format("YYYY-MM-DDTHH:mm:ss+00:00"));
+    selectedTime = new Date(dayjs(selectedTime.getTime()).format("YYYY-MM-DDTHH:mm:ss+00:00"));
+    console.log("Selected Time:", selectedTime);
     const fiveHoursFromSelectedTime = new Date(selectedTime.getTime() + 5 * 60 * 60 * 1000);
-    getAvailableRooms(fiveHoursFromSelectedTime);
+    const rooms = await RoomService.getRoomList();
+    try {
+    const filteredRooms = await Promise.all(rooms.map(async (room: Room) => {
+      const reservations = await ReservationService.getReservationByRoomId(room.id);
+      const hasReservations = reservations.some((reservation: Reservation) => {
+        const reservationStartTime = new Date(reservation.start);
+        const reservationEndTime = new Date(reservation.finish);
+        console.log("Selected Time:", selectedTime);
+        console.log("reservationStartTime: ", reservationStartTime + "selected Time: ", new Date(dayjs(selectedTime.getTime()).format("YYYY-MM-DDTHH:mm:ss+00:00"))) 
+        return (
+          reservationStartTime >= new Date(dayjs(selectedTime.getTime()).format("YYYY-MM-DDTHH:mm:ss+00:00")) &&
+          reservationEndTime <= fiveHoursFromSelectedTime
+        );
+      });
+      return !hasReservations ? room : null;
+    }));
+    setRooms(filteredRooms.filter(room => room !== null));
+  } catch (error) {
+    setTitle("No Available Rooms");
+    console.error("Error getting available rooms:", error);
+  }
+    //getAvailableRooms(fiveHoursFromSelectedTime);
     setTitle("All Available Rooms in 5 hours from " + dayjs(selectedTime).subtract(dayjs(selectedTime).utcOffset(), 'minute').format("HH:mm:ss"));
   }
+
+  const testGetAvailableRooms = async (selectedTime: Date) => {
+    RoomService.getAvailableRoomsInDateRange(new Date(dayjs(selectedTime.getTime()).format("YYYY-MM-DDTHH:mm:ss+00:00")).toJSON()).then((data) => {
+      setRooms(data);
+    });
+  }
+
 
   const getAvailableRoomsInFiveHours = async () => {
     const fiveHoursFromNow = new Date(currentTime.getTime() + 5 * 60 * 60 * 1000);
@@ -89,7 +118,7 @@ function HomepageComponent() {
           <LocalizationProvider dateAdapter={AdapterDayjs} >
           <DateTimePicker value={dayjs(selectedTime)} onChange={(value) => setSelectedTime(value?.toDate()!)} />
           </LocalizationProvider>
-          <Button onClick={() => getAvailableRoomsCustom(selectedTime)}>Available in custom range</Button>
+          <Button onClick={() => testGetAvailableRooms(selectedTime)}>Available in custom range</Button>
         </Grid>
         <Grid item xs={12} className="text-center">
           <h1 className="text-4xl font-bold">{title}</h1>

@@ -71,4 +71,9 @@ public class ReservationServiceImpl implements ReservationService {
     public void deleteReservation(Long id) {
         reservationRepository.deleteById(id);
     }
+
+    @Override
+    public List<Reservation> getReservationsByStatus(ReservationStatusEnum status) {
+        return reservationRepository.findReservationsByStatus(status);
+    }
 }

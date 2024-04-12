@@ -1,6 +1,7 @@
 package com.example.hotel.booking.controller;
 
 import com.example.hotel.booking.entity.Reservation;
+import com.example.hotel.booking.enums.ReservationStatusEnum;
 import com.example.hotel.booking.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,12 @@ public class ReservationController {
     @DeleteMapping("/delete/{id}")
     public void deleteReservation(@PathVariable("id") Long id){
         reservationService.deleteReservation(id);
+    }
+
+    @GetMapping("/find/status/{status}")
+    public ResponseEntity<List<Reservation>> getReservationsByStatus(@PathVariable("status") ReservationStatusEnum status){
+        List<Reservation> reservations = reservationService.getReservationsByStatus(status);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
 }

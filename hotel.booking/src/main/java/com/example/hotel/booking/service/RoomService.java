@@ -3,6 +3,7 @@ package com.example.hotel.booking.service;
 import com.example.hotel.booking.entity.Room;
 import com.example.hotel.booking.enums.RoomStatusEnum;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomService {
@@ -13,4 +14,5 @@ public interface RoomService {
     public Room getRoomByNumber(String number);
     public List<Room> getRoomByStatus(RoomStatusEnum status);
     public void deleteRoom(Long id);
+    List<Room> getAvailableRoomsInDateRange(LocalDateTime selectedTime);
 }

@@ -2,6 +2,7 @@ package com.example.hotel.booking.service.impl;
 
 import com.example.hotel.booking.entity.Room;
 import com.example.hotel.booking.enums.RoomStatusEnum;
+import com.example.hotel.booking.repository.ReservationRepository;
 import com.example.hotel.booking.repository.RoomRepository;
 import com.example.hotel.booking.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,18 +10,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Transactional
 @Qualifier("roomService")
 public class RoomServiceImpl implements RoomService {
+    private final ReservationRepository reservationRepository;
     private RoomRepository roomRepository;
 
     @Autowired
-    public RoomServiceImpl(RoomRepository roomRepository) {
+    public RoomServiceImpl(RoomRepository roomRepository, ReservationRepository reservationRepository) {
         this.roomRepository = roomRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     @Override
@@ -70,5 +73,23 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void deleteRoom(Long id) {
         roomRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Room> getAvailableRoomsInDateRange(LocalDateTime selectedTime){
+        List<Room> rooms = roomRepository.findAll();
+        //TODO: Make a variable selectedTime plus 5 hours
+        LocalDateTime selectedTimePlus5Hours = selectedTime.plusHours(5);
+        List<Room> roomsToRemove = new ArrayList<>();
+        for (Room room : rooms){
+            reservationRepository.findReservationsByRoomId(room.getId()).forEach(reservation -> {
+                if (reservation.getStart().isBefore(selectedTimePlus5Hours) && reservation.getFinish().isAfter(selectedTime)){
+                    roomsToRemove.add(room);
+                }
+            });
+
+        }
+        rooms.removeAll(roomsToRemove);
+        return rooms;
     }
 }
