@@ -38,6 +38,21 @@ static async deleteUser(id: number) {
     return response.data;
 }
 
+static async getAvailableRooms() {
+    const response = await axios.get(`${BASE_URL}/room/find/available`);
+    return response.data;
+}
+
+static async getAvailableRoomsInFiveHours() {
+    const response = await axios.get(`${BASE_URL}/room/find/available/five-hours`);
+    return response.data;
+}
+
+static async getAvailableRoomsInOneDay() {
+    const response = await axios.get(`${BASE_URL}/room/find/available/one-day`);
+    return response.data;
+}
+
 static async getAvailableRoomsInDateRange(selectedTime: String) {
     const response = await axios.get(`${BASE_URL}/room/find/available/${selectedTime}`);
     return response.data;

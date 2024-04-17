@@ -41,7 +41,6 @@ export default function RoomComponent() {
 
   useEffect(() => {
     RoomService.getRoomList().then((data) => setRooms(data));
-    //changeStatus();
   }, []);
 
   const openModal = () => {
@@ -57,40 +56,6 @@ export default function RoomComponent() {
     setIsModalOpen(true);
     setSelectedRoom(room); // Set the selected room
   };
-
-  // const getRoomList = async () => {
-  //   const data = await RoomService.getRoomList();
-  //   setRooms(data);
-  // }
-
-  // const changeStatus = async () => {
-  //   console.log("Changing room status");
-  //   await getRoomList();
-  //   rooms.forEach(async (room) => {
-  //     const reservations = await ReservationService.getReservationByRoomId(
-  //       room.id
-  //     );
-  //     if (reservations.length === 0) {
-  //       room.status = RoomStatus.AVAILABLE;
-  //       RoomService.updateRoom(room);
-  //       return;
-  //     }
-  //     const hasReservations = reservations.some((reservation: Reservation) => {
-  //       return (
-  //         reservation.status === ReservationStatus.ACTIVE
-  //       );
-  //     });
-  //     if (hasReservations) {
-  //       room.status = RoomStatus.OCCUPIED;
-  //     } else {
-  //       room.status = RoomStatus.AVAILABLE;
-  //     }
-  //     RoomService.updateRoom(room);
-  //   });
-  // };
-
-  //changeStatus();
-  //setInterval(changeStatus, 1000 * 30);
 
   return (
     <>

@@ -76,9 +76,56 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public List<Room> getAvailableRooms() {
+        List<Room> rooms = roomRepository.findAll();
+        List<Room> availableRooms = new ArrayList<>();
+        for (Room room : rooms){
+            if (room.getStatus().equals(RoomStatusEnum.AVAILABLE)){
+                availableRooms.add(room);
+            }
+        }
+        return availableRooms;
+    }
+
+    @Override
+    public List<Room> getAvailableRoomsInFiveHours(){
+        List<Room> rooms = roomRepository.findAll();
+        LocalDateTime selectedTime = LocalDateTime.now();
+        LocalDateTime selectedTimePlus5Hours = selectedTime.plusHours(5);
+        List<Room> roomsToRemove = new ArrayList<>();
+        for (Room room : rooms){
+            reservationRepository.findReservationsByRoomId(room.getId()).forEach(reservation -> {
+                if (reservation.getStart().isBefore(selectedTimePlus5Hours) && reservation.getFinish().isAfter(selectedTime)){
+                    roomsToRemove.add(room);
+                }
+            });
+
+        }
+        rooms.removeAll(roomsToRemove);
+        return rooms;
+    }
+
+    @Override
+    public List<Room> getAvailableRoomsInOneDay(){
+        List<Room> rooms = roomRepository.findAll();
+        LocalDateTime selectedTime = LocalDateTime.now();
+        LocalDateTime selectedTimePlus24Hours = selectedTime.plusHours(24);
+        List<Room> roomsToRemove = new ArrayList<>();
+        for (Room room : rooms){
+            reservationRepository.findReservationsByRoomId(room.getId()).forEach(reservation -> {
+                if (reservation.getStart().isBefore(selectedTimePlus24Hours) && reservation.getFinish().isAfter(selectedTime)){
+                    roomsToRemove.add(room);
+                }
+            });
+
+        }
+        rooms.removeAll(roomsToRemove);
+        return rooms;
+    }
+
+    @Override
     public List<Room> getAvailableRoomsInDateRange(LocalDateTime selectedTime){
         List<Room> rooms = roomRepository.findAll();
-        //TODO: Make a variable selectedTime plus 5 hours
         LocalDateTime selectedTimePlus5Hours = selectedTime.plusHours(5);
         List<Room> roomsToRemove = new ArrayList<>();
         for (Room room : rooms){

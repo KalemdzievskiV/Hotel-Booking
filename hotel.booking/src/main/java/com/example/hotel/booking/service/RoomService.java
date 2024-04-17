@@ -14,5 +14,8 @@ public interface RoomService {
     public Room getRoomByNumber(String number);
     public List<Room> getRoomByStatus(RoomStatusEnum status);
     public void deleteRoom(Long id);
+    public List<Room> getAvailableRooms();
+    public List<Room> getAvailableRoomsInFiveHours();
+    public List<Room> getAvailableRoomsInOneDay();
     List<Room> getAvailableRoomsInDateRange(LocalDateTime selectedTime);
 }

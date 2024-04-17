@@ -56,14 +56,32 @@ public class RoomController {
         return new ResponseEntity<>(room, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteRoom(@PathVariable("id") Long id) {
-        roomService.deleteRoom(id);
+    @GetMapping("/find/available")
+    public ResponseEntity<List<Room>> getAvailableRooms() {
+        List<Room> rooms = roomService.getAvailableRooms();
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
+    @GetMapping("/find/available/five-hours")
+    public ResponseEntity<List<Room>> getAvailableRoomsInFiveHours() {
+        List<Room> rooms = roomService.getAvailableRoomsInFiveHours();
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
+    @GetMapping("/find/available/one-day")
+    public ResponseEntity<List<Room>> getAvailableRoomsInOneDay() {
+        List<Room> rooms = roomService.getAvailableRoomsInOneDay();
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
     @GetMapping("/find/available/{selectedTime}")
     public ResponseEntity<List<Room>> getAvailableRoomsInDateRange(@PathVariable("selectedTime") String selectedTime) {
         List<Room> rooms = roomService.getAvailableRoomsInDateRange(LocalDateTime.parse(selectedTime, formatter));
         return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteRoom(@PathVariable("id") Long id) {
+        roomService.deleteRoom(id);
     }
 }
