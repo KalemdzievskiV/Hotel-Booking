@@ -6,11 +6,15 @@ import { Room } from "../../types/room.type";
 import AddRoomComponent from "./AddRoomComponent";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomTable from "../shared/CustomTable";
+import NewNavBar from "../Layout/NewNavBar";
 
 export default function RoomComponent() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
   const columns = [
     { id: 'number', label: 'Number' },
@@ -25,8 +29,11 @@ export default function RoomComponent() {
   };
 
   useEffect(() => {
-    RoomService.getRoomList().then((data) => setRooms(data));
-  }, []);
+    RoomService.getRoomListPageable(page, rowsPerPage).then((response) => {
+      setRooms(response.data);
+      setTotalCount(response.totalCount);
+    });
+  }, [page, rowsPerPage]);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -39,15 +46,12 @@ export default function RoomComponent() {
   };
 
   return (
-    <>
-      <NavBar />
+    <NewNavBar>
       <Paper
         elevation={3}
         style={{
           padding: "20px",
-          margin: "auto",
-          marginTop: "2vh",
-          maxWidth: "90%",
+          margin: "20px",
           backgroundColor: "#f4f6f8",
         }}
       >
@@ -68,6 +72,11 @@ export default function RoomComponent() {
           onEdit={editRoom}
           onDelete={(room) => console.log('Delete room', room.id)}
           renderCell={renderCell}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={setPage}
+          onRowsPerPageChange={setRowsPerPage}
+          totalCount={totalCount}
         />
       </Paper>
 
@@ -99,6 +108,6 @@ export default function RoomComponent() {
           <AddRoomComponent roomToUpdate={selectedRoom!} onClose={closeModal} />
         </Box>
       </Modal>
-    </>
+    </NewNavBar>
   );
 }

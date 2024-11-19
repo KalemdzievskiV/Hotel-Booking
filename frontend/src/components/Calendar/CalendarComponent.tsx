@@ -158,17 +158,6 @@ export default function CalendarComponent() {
             p: 4,
           }}
         >
-          <Typography
-            variant="h5"
-            sx={{
-              mb: 4,
-              fontWeight: 600,
-              color: "#1f2937",
-            }}
-          >
-            Add Reservation
-          </Typography>
-
           <AddReservationComponent
             start={dayjs(selectedSlot?.start).toDate()}
             end={dayjs(selectedSlot?.end).toDate()}

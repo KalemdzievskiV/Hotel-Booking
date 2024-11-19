@@ -24,6 +24,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import WeekendIcon from '@mui/icons-material/Weekend';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import NewNavBar from '../Layout/NewNavBar';
 
 // Styled components for calendar
 const CalendarDay = styled(Paper)(({ theme }) => ({
@@ -188,7 +189,7 @@ const NewCalendarComponent: React.FC = () => {
 
   return (
     <Box>
-      <NavBar />
+      <NewNavBar />
       <Box sx={{ p: 3 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
           {/* Calendar Header */}

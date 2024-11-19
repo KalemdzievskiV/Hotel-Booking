@@ -1,4 +1,4 @@
-import { Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination } from "@mui/material";
 
 interface Column {
   id: string;
@@ -12,9 +12,25 @@ interface CustomTableProps {
   onEdit: (item: any) => void;
   onDelete?: (item: any) => void;
   renderCell: (column: Column, item: any) => React.ReactNode;
+  page?: number;
+  rowsPerPage?: number;
+  onPageChange?: (newPage: number) => void;
+  onRowsPerPageChange?: (newRowsPerPage: number) => void;
+  totalCount?: number;
 }
 
-export default function CustomTable({ columns, data, onEdit, onDelete, renderCell }: CustomTableProps) {
+export default function CustomTable({ 
+  columns, 
+  data, 
+  onEdit, 
+  onDelete, 
+  renderCell,
+  page = 0,
+  rowsPerPage = 10,
+  onPageChange,
+  onRowsPerPageChange,
+  totalCount
+}: CustomTableProps) {
   return (
     <TableContainer className="mx-2" style={{ marginTop: "20px" }}>
       <Table
@@ -85,6 +101,17 @@ export default function CustomTable({ columns, data, onEdit, onDelete, renderCel
           ))}
         </TableBody>
       </Table>
+      {onPageChange && onRowsPerPageChange && (
+        <TablePagination
+          component="div"
+          count={totalCount || data.length}
+          page={page}
+          onPageChange={(_, newPage) => onPageChange(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(event) => onRowsPerPageChange(parseInt(event.target.value, 10))}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
+      )}
     </TableContainer>
   );
 } 

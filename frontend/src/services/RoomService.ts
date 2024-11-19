@@ -58,5 +58,13 @@ static async getAvailableRoomsInDateRange(selectedTime: String) {
     return response.data;
 }
 
+static async getRoomListPageable(page: number = 0, rowsPerPage: number = 10) {
+    const response = await axios.get(`${BASE_URL}/room/pageable?page=${page}&size=${rowsPerPage}`);
+    return {
+        data: response.data.content,
+        totalCount: response.data.totalElements
+    };
+}
+
 }
 export default RoomService;

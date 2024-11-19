@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -47,6 +49,12 @@ public class RoomController {
     @GetMapping("/list")
     public ResponseEntity<List<Room>> getAllRooms() {
         List<Room> rooms = roomService.getRoomList();
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
+    @GetMapping("/pageable")
+    public ResponseEntity<Page<Room>> getRoomsPageable(Pageable pageable) {
+        Page<Room> rooms = roomService.getRoomListPageable(pageable);
         return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
