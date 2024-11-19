@@ -1,104 +1,76 @@
 import NavBar from "../Layout/NavBar";
-import * as React from "react";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { Box, Button, IconButton, Modal, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
 import RoomService from "../../services/RoomService";
 import { Room } from "../../types/room.type";
-import { Box, Button, IconButton, Modal } from "@mui/material";
 import AddRoomComponent from "./AddRoomComponent";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
+import CloseIcon from "@mui/icons-material/Close";
+import CustomTable from "../shared/CustomTable";
 
 export default function RoomComponent() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
+  const columns = [
+    { id: 'number', label: 'Number' },
+    { id: 'name', label: 'Name', align: 'center' as const },
+    { id: 'status', label: 'Status', align: 'center' as const },
+    { id: 'description', label: 'Description', align: 'center' as const },
+    { id: 'maxCapacity', label: 'Max Capacity', align: 'center' as const },
+  ];
+
+  const renderCell = (column: { id: string }, room: Room) => {
+    return room[column.id as keyof Room];
+  };
+
   useEffect(() => {
     RoomService.getRoomList().then((data) => setRooms(data));
   }, []);
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
+  const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setSelectedRoom(null);
     setIsModalOpen(false);
   };
-
   const editRoom = (room: Room) => {
     setIsModalOpen(true);
-    setSelectedRoom(room); // Set the selected room
+    setSelectedRoom(room);
   };
 
   return (
     <>
       <NavBar />
-      <div className="mx-3 mb-2">
-        <Button variant="outlined" color="success" onClick={openModal}>
-          Add Room
-        </Button>
-      </div>
-      <TableContainer component={Paper} className="w-fit">
-        <Table aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Number</StyledTableCell>
-              <StyledTableCell align="right">Name</StyledTableCell>
-              <StyledTableCell align="right">Status</StyledTableCell>
-              <StyledTableCell align="right">description</StyledTableCell>
-              <StyledTableCell align="right">maxCapacity</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rooms.map((room) => (
-              <StyledTableRow
-                key={room.id}
-                onDoubleClick={() => editRoom(room)}
-                style={{ cursor: "pointer" }}
-              >
-                <StyledTableCell component="th" scope="row">
-                  {room.number}
-                </StyledTableCell>
-                <StyledTableCell align="right">{room.name}</StyledTableCell>
-                <StyledTableCell align="right">{room.status}</StyledTableCell>
-                <StyledTableCell align="right">
-                  {room.description}
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  {room.maxCapacity}
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Paper
+        elevation={3}
+        style={{
+          padding: "20px",
+          margin: "auto",
+          marginTop: "2vh",
+          maxWidth: "90%",
+          backgroundColor: "#f4f6f8",
+        }}
+      >
+        <div className="mx-3 mb-2" style={{ textAlign: "right" }}>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={openModal}
+            style={{ marginBottom: "20px" }}
+          >
+            ADD ROOM
+          </Button>
+        </div>
+        
+        <CustomTable
+          columns={columns}
+          data={rooms}
+          onEdit={editRoom}
+          onDelete={(room) => console.log('Delete room', room.id)}
+          renderCell={renderCell}
+        />
+      </Paper>
+
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box
           sx={{
@@ -106,10 +78,12 @@ export default function RoomComponent() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: "400px",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
+            borderRadius: "8px",
+            textAlign: "center",
           }}
         >
           <IconButton
@@ -119,7 +93,9 @@ export default function RoomComponent() {
               top: "8px",
               right: "8px",
             }}
-          ></IconButton>
+          >
+            <CloseIcon />
+          </IconButton>
           <AddRoomComponent roomToUpdate={selectedRoom!} onClose={closeModal} />
         </Box>
       </Modal>

@@ -1,0 +1,107 @@
+/* Calendar container */
+.rbc-calendar {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Header styling */
+.rbc-toolbar {
+  margin-bottom: 20px;
+}
+
+.rbc-toolbar button {
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  border-radius: 6px;
+  padding: 8px 16px;
+  margin: 0 4px;
+  font-weight: 500;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #f3f4f6;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Time grid styling */
+.rbc-time-header {
+  background-color: #f9fafb;
+  border-radius: 8px 8px 0 0;
+}
+
+.rbc-header {
+  padding: 12px 4px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-time-content {
+  border: 1px solid #e5e7eb;
+}
+
+.rbc-time-slot {
+  color: #6b7280;
+}
+
+/* Event styling */
+.rbc-event {
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.rbc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-event-content {
+  font-weight: 500;
+  font-size: 0.813rem;
+  letter-spacing: 0.2px;
+}
+
+/* Time grid lines */
+.rbc-time-gutter {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.rbc-timeslot-group {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Current time indicator */
+.rbc-current-time-indicator {
+  background-color: #ef4444;
+  height: 2px;
+}
+
+/* Selection highlight */
+.rbc-slot-selection {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Today highlight */
+.rbc-today {
+  background-color: rgba(239, 246, 255, 0.6) !important;
+}
+
+.rbc-time-content .rbc-today {
+  border-left: 1px solid #d1d5db;
+  border-right: 1px solid #d1d5db;
+}
+
+/* Ensure time slots in today column have borders */
+.rbc-today .rbc-timeslot-group {
+  border-bottom: 1px solid #e5e7eb;
+} 

@@ -3,14 +3,15 @@ import NavBar from "../Layout/NavBar";
 import { Reservation } from "../../types/reservation.type";
 import { useEffect, useState } from "react";
 import ReservationService from "../../services/ReservationService";
-import { Box, IconButton, Modal } from "@mui/material";
+import { Box, IconButton, Modal, Typography } from "@mui/material";
 import AddReservationComponent from "../Reservation/AddReservationComponent";
 import { SlotInfo } from "react-big-calendar";
 import dayjs from "dayjs";
 import Filter from "../Layout/Filter";
 import ReservationStatus from "../../enum/reservation/reservation.status.enum";
 import { useLocation } from "react-router-dom";
-import AppointmentEvent from "./ReservationEvent";
+import { eventStyleGetter } from './eventStyleGetter'; 
+import './calendar.css';
 
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -44,8 +45,8 @@ export default function CalendarComponent() {
   };
 
   const openEditModal = (reservation: Reservation) => {
-    //setSelectedReservation(reservation);
-    console.log("reservation select: ", reservation);
+    setSelectedReservation(reservation);
+    console.log("reservation select: ", selectedReservation);
     setIsModalOpen(true);
   }
 
@@ -88,32 +89,51 @@ export default function CalendarComponent() {
       " - User: " +
       reservation.user.firstName,
     color:  
-      reservation.status === ReservationStatus.ACTIVE ? "green" :
-      reservation.status === ReservationStatus.COMPLETED ? "orange" :
-      reservation.status === ReservationStatus.CANCELED ? "red" : "blue",
-
+      reservation.status === ReservationStatus.ACTIVE ? "#86efac" :    // Pastel green
+      reservation.status === ReservationStatus.COMPLETED ? "#fdba74" : // Pastel orange
+      reservation.status === ReservationStatus.CANCELED ? "#fca5a5" :  // Pastel red
+      "#93c5fd",  // Pastel blue (default)
   }));
   
   
-  const eventStyleGetter = (event: any, start: any, end: any, isSelected: any) => {
-    var backgroundColor = event.color;
-    var style = {
-        backgroundColor: backgroundColor,
-        borderRadius: '0px',
-        border: '0px',
-        display: 'block'
+  // const eventStyleGetter = (event: any, start: any, end: any, isSelected: any) => {
+  //   var backgroundColor = event.color;
+  //   var style = {
+  //       backgroundColor: backgroundColor,
+  //       borderRadius: '0px',
+  //       border: '0px',
+  //       display: 'block'
         
-    };
+  //   };
+  //   return {
+  //       style: style
+  //   };
+  // }
+  const eventStyleGetter = (event: any) => {
     return {
-        style: style
+      style: {
+        backgroundColor: event.color,
+        color: '#374151',  // Dark gray text
+        opacity: 0.9,
+        border: 'none',
+        display: 'block'
+      }
     };
-  }
+  };
   return (
     <div>
       <NavBar />
       <Filter title="Room" service="room" onChange={handleFilterChange} roomId={roomId}/>
       <Calendar
-        style={{ marginTop: 20, marginRight: 5, marginLeft: 5}}
+        style={{ 
+          marginTop: 20, 
+          marginRight: 20, 
+          marginLeft: 20,
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
         events={events}
         defaultView="week"
         selectable
@@ -133,18 +153,22 @@ export default function CalendarComponent() {
             transform: "translate(-50%, -50%)",
             width: 400,
             bgcolor: "background.paper",
-            boxShadow: 24,
+            borderRadius: "12px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
             p: 4,
           }}
         >
-          <IconButton
-            onClick={closeModal}
+          <Typography
+            variant="h5"
             sx={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
+              mb: 4,
+              fontWeight: 600,
+              color: "#1f2937",
             }}
-          ></IconButton>
+          >
+            Add Reservation
+          </Typography>
+
           <AddReservationComponent
             start={dayjs(selectedSlot?.start).toDate()}
             end={dayjs(selectedSlot?.end).toDate()}

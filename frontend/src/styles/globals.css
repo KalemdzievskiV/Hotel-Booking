@@ -1,0 +1,10 @@
+@layer components {
+  .MuiButton-root {
+    text-transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .MuiCard-root {
+    background-color: white !important;
+  }
+} 

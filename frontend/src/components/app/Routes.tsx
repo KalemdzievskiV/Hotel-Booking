@@ -5,6 +5,8 @@ import HomepageComponent from "../HomepageComponent";
 import UserComponent from "../User/UserComponent";
 import RoomComponent from "../Room/RoomComponent";
 import ReservationComponent from "../Reservation/ReservationComponent";
+import NewCalendarComponent from "../Calendar/NewCalendarComponent";
+import TimelineCalendar from "../Calendar/TimelineCalendarComponent";
 
 const AppRoutes = () => {
     return <>
@@ -16,6 +18,7 @@ const AppRoutes = () => {
                 <Route path="/user" element={<UserComponent/>}/>
                 <Route path="/room" element={<RoomComponent/>}/>
                 <Route path="/reservation" element={<ReservationComponent/>}/>
+                <Route path="/new-calendar" element={<TimelineCalendar/>}/>
             </Routes>
         </Router>
     </>;

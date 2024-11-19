@@ -44,6 +44,11 @@ function NavBar(props: Props) {
       id:5,
       text: "Reservations",
       onClick: () => navigate("/reservation"),
+    },
+    {
+      id:6,
+      text: "New Calendar",
+      onClick: () => navigate("/new-calendar"),
     }
   ];
   
@@ -61,7 +66,7 @@ function NavBar(props: Props) {
           {navItems.map((item) => (
             <ListItem key={item.id} disablePadding>
               <ListItemButton sx={{ textAlign: 'center' }} onClick={item.onClick}>
-                <ListItemText primary={item.id} />
+                <ListItemText primary={item.text} />
               </ListItemButton>
             </ListItem>
           ))}

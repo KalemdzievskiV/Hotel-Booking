@@ -1,92 +1,76 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Chip,
-  IconButton,
-  Modal,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
-import Paper from "@mui/material/Paper";
+import { Box, Button, IconButton, Modal, Paper } from "@mui/material";
 import UserService from "../../services/UserService";
 import { User } from "../../types/user.type";
 import AddUserComponent from "./AddUserComponent";
 import CloseIcon from "@mui/icons-material/Close";
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NavBar from "../Layout/NavBar";
+import CustomTable from "../shared/CustomTable";
 
 function UserComponent() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  const columns = [
+    { id: 'firstName', label: 'First Name' },
+    { id: 'lastName', label: 'Last Name', align: 'center' as const },
+    { id: 'email', label: 'Email', align: 'center' as const },
+    { id: 'phoneNumber', label: 'Phone', align: 'center' as const },
+    { id: 'userRole', label: 'Role', align: 'center' as const },
+  ];
+
+  const renderCell = (column: { id: string }, user: User) => {
+    return user[column.id as keyof User];
+  };
+
   useEffect(() => {
     UserService.getUsers().then((data) => setUsers(data));
   }, []);
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
+  const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setSelectedUser(null);
     setIsModalOpen(false);
   };
-
   const editUser = (user: User) => {
     setIsModalOpen(true);
-    setSelectedUser(user); // Set the selected user
+    setSelectedUser(user);
   };
 
   return (
     <div>
-      <NavBar/>
-      <Paper className="mt-2">
-      <div className="mx-3 mb-2">
-      <Button variant="outlined" color="success" onClick={openModal}>Add User</Button>
-      </div>
-      <TableContainer className="mx-2">
-        <Table
-          size="medium"
-          sx={{marginTop: "10vh", margin: "auto",}}
-          aria-label="simple table"
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell align="right">Last Name</TableCell>
-              <TableCell align="right">Email</TableCell>
-              <TableCell align="right">Phone</TableCell>
-              <TableCell align="right">Role</TableCell>
-              <TableCell align="right"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow
-                key={user.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                onDoubleClick={() => editUser(user)}
-                style={{ cursor: "pointer" }}
-              >
-                <TableCell component="th" scope="row">
-                  {user.firstName}
-                </TableCell>
-                <TableCell align="right">{user.lastName}</TableCell>
-                <TableCell align="right">{user.email}</TableCell>
-                <TableCell align="right">{user.phoneNumber}</TableCell>
-                <TableCell align="right">{user.userRole}</TableCell>
-                <TableCell align="right"><Chip label="Delete"></Chip></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <NavBar />
+      <Paper
+        elevation={3}
+        style={{
+          padding: "20px",
+          margin: "auto",
+          marginTop: "2vh",
+          maxWidth: "90%",
+          backgroundColor: "#f4f6f8",
+        }}
+      >
+        <div className="mx-3 mb-2" style={{ textAlign: "right" }}>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={openModal}
+            style={{ marginBottom: "20px" }}
+          >
+            Add User
+          </Button>
+        </div>
+        
+        <CustomTable
+          columns={columns}
+          data={users}
+          onEdit={editUser}
+          onDelete={(user) => console.log('Delete user', user.id)}
+          renderCell={renderCell}
+        />
+      </Paper>
+
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box
           sx={{
@@ -94,10 +78,12 @@ function UserComponent() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: "400px",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
+            borderRadius: "8px",
+            textAlign: "center",
           }}
         >
           <IconButton
@@ -113,7 +99,6 @@ function UserComponent() {
           <AddUserComponent userToUpdate={selectedUser!} onClose={closeModal} />
         </Box>
       </Modal>
-      </Paper>
     </div>
   );
 }
