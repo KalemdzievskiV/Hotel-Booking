@@ -3,6 +3,8 @@ package com.example.hotel.booking.controller;
 import com.example.hotel.booking.entity.User;
 import com.example.hotel.booking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,12 +43,17 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    @GetMapping("/pageable")
+    public ResponseEntity<Page<User>> getUsersPageable(Pageable pageable) {
+        Page<User> users = userService.getUserListPageable(pageable);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
     @GetMapping("/find/{firstName}")
     public ResponseEntity<User> getUserByFirstName(@PathVariable("firstName") String firstName) {
         User user = userService.getUserByFirstName(firstName);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
-
 
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable("id") Long id) {

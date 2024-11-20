@@ -1,9 +1,14 @@
 package com.example.hotel.booking.controller;
 
 import com.example.hotel.booking.entity.Reservation;
+import com.example.hotel.booking.entity.Room;
 import com.example.hotel.booking.enums.ReservationStatusEnum;
 import com.example.hotel.booking.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +52,18 @@ public class ReservationController {
     public ResponseEntity<List<Reservation>> getAllReservations(){
         List<Reservation> reservations = reservationService.getReservationList();
         return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
+
+    @GetMapping("/pageable")
+    public ResponseEntity<Page<Reservation>> getReservationsPageable(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "start") String sort,
+            @RequestParam(defaultValue = "desc") String direction) {
+        
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction.toUpperCase());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        return ResponseEntity.ok(reservationService.getReservationListPageable(pageable));
     }
 
     @DeleteMapping("/delete/{id}")

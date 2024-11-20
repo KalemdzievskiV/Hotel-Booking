@@ -1,11 +1,11 @@
 package com.example.hotel.booking.service.impl;
 
 import com.example.hotel.booking.entity.Reservation;
-import com.example.hotel.booking.enums.ReservationStatusEnum;
 import com.example.hotel.booking.repository.ReservationRepository;
 import com.example.hotel.booking.service.ReservationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,22 +13,36 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
-@Qualifier("reservationService")
+@RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
-    private ReservationRepository reservationRepository;
 
-    @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository) {
-        this.reservationRepository = reservationRepository;
-    }
+    private final ReservationRepository reservationRepository;
+
     @Override
+    @Transactional(readOnly = true)
+    public Page<Reservation> getReservationListPageable(Pageable pageable) {
+        return reservationRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Reservation getReservationById(Long id) {
+        return reservationRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional
     public Reservation addNewReservation(Reservation reservation) {
         Reservation newReservation = new Reservation();
         Optional.ofNullable(reservation.getStart()).ifPresent(newReservation::setStart);
         Optional.ofNullable(reservation.getFinish()).ifPresent(newReservation::setFinish);
         if (reservation.getStatus() == null){
-            newReservation.setStatus(ReservationStatusEnum.BOOKED);
+            if (reservation.getFinish().isBefore(LocalDateTime.now())){
+                newReservation.setStatus(ReservationStatusEnum.COMPLETED);
+            }
+            else{
+                newReservation.setStatus(ReservationStatusEnum.BOOKED);
+            }
         } else {
             newReservation.setStatus(reservation.getStatus());
         }
@@ -40,6 +54,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public Reservation updateReservation(Reservation reservation) {
         Reservation newReservation = reservationRepository.findById(reservation.getId()).orElse(null);
         Optional.ofNullable(reservation.getStart()).ifPresent(newReservation::setStart);
@@ -50,11 +65,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservationRepository.save(newReservation);
         return newReservation;
-    }
-
-    @Override
-    public Reservation getReservationById(Long id) {
-        return reservationRepository.findById(id).orElse(null);
     }
 
     @Override

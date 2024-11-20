@@ -5,6 +5,8 @@ import com.example.hotel.booking.repository.UserRepository;
 import com.example.hotel.booking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +65,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUserList() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public Page<User> getUserListPageable(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override

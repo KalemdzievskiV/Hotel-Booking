@@ -17,11 +17,11 @@ export default function RoomComponent() {
   const [totalCount, setTotalCount] = useState(0);
 
   const columns = [
-    { id: 'number', label: 'Number' },
-    { id: 'name', label: 'Name', align: 'center' as const },
-    { id: 'status', label: 'Status', align: 'center' as const },
-    { id: 'description', label: 'Description', align: 'center' as const },
-    { id: 'maxCapacity', label: 'Max Capacity', align: 'center' as const },
+    { id: 'number', label: 'Number', sortable: true },
+    { id: 'name', label: 'Name', align: 'center' as const, sortable: true },
+    { id: 'status', label: 'Status', align: 'center' as const, sortable: true },
+    { id: 'description', label: 'Description', align: 'center' as const, sortable: true },
+    { id: 'maxCapacity', label: 'Max Capacity', align: 'center' as const, sortable: true },
   ];
 
   const renderCell = (column: { id: string }, room: Room) => {
@@ -51,7 +51,7 @@ export default function RoomComponent() {
         elevation={3}
         style={{
           padding: "20px",
-          margin: "20px",
+          margin: "5px 20px 20px 20px",
           backgroundColor: "#f4f6f8",
         }}
       >

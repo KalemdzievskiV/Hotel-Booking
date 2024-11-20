@@ -1,9 +1,9 @@
 import Calendar from "./Calendar";
-import NavBar from "../Layout/NavBar";
+import NewNavBar from "../Layout/NewNavBar";
 import { Reservation } from "../../types/reservation.type";
 import { useEffect, useState } from "react";
 import ReservationService from "../../services/ReservationService";
-import { Box, IconButton, Modal, Typography } from "@mui/material";
+import { Box, IconButton, Modal, Paper } from "@mui/material";
 import AddReservationComponent from "../Reservation/AddReservationComponent";
 import { SlotInfo } from "react-big-calendar";
 import dayjs from "dayjs";
@@ -16,16 +16,13 @@ import './calendar.css';
 export default function CalendarComponent() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservation, setSelectedReservation] =
-    useState<Reservation | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{
     start: Date;
     end: Date;
   } | null>(null);
   const [roomId, setRoomId] = useState<number | null>(null);
   const location = useLocation();
-
-  
 
   useEffect(() => {
     ReservationService.getReservationList().then((data) =>
@@ -94,21 +91,7 @@ export default function CalendarComponent() {
       reservation.status === ReservationStatus.CANCELED ? "#fca5a5" :  // Pastel red
       "#93c5fd",  // Pastel blue (default)
   }));
-  
-  
-  // const eventStyleGetter = (event: any, start: any, end: any, isSelected: any) => {
-  //   var backgroundColor = event.color;
-  //   var style = {
-  //       backgroundColor: backgroundColor,
-  //       borderRadius: '0px',
-  //       border: '0px',
-  //       display: 'block'
-        
-  //   };
-  //   return {
-  //       style: style
-  //   };
-  // }
+
   const eventStyleGetter = (event: any) => {
     return {
       style: {
@@ -120,52 +103,77 @@ export default function CalendarComponent() {
       }
     };
   };
+
   return (
-    <div>
-      <NavBar />
-      <Filter title="Room" service="room" onChange={handleFilterChange} roomId={roomId}/>
-      <Calendar
-        style={{ 
-          marginTop: 20, 
-          marginRight: 20, 
-          marginLeft: 20,
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        }}
-        events={events}
-        defaultView="week"
-        selectable
-        onSelectSlot={openModal}
-        onSelectEvent={(event, e) => reservations.map((reservation) => openEditModal(reservation))}
-        eventPropGetter={eventStyleGetter}
-        allDayAccessor={() => false}
-        showMultiDayTimes
-        endAccessor={({ end }) => new Date((end ?? new Date()).getTime() - 1)}
-      />
-      <Modal open={isModalOpen} onClose={closeModal}>
-        <Box
+    <NewNavBar>
+      <Box sx={{ 
+        flexGrow: 1,
+        backgroundColor: "#f4f6f8",
+        minHeight: "100vh",
+        padding: "20px"
+      }}>
+        <Paper
+          elevation={3}
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: "12px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-            p: 4,
+            backgroundColor: "#f4f6f8",
+            padding: "20px",
+            margin: "0"
           }}
         >
-          <AddReservationComponent
-            start={dayjs(selectedSlot?.start).toDate()}
-            end={dayjs(selectedSlot?.end).toDate()}
-            reservationToUpdate={selectedReservation!}
-            onClose={closeModal}
+          <Filter 
+            title="Room" 
+            service="room" 
+            onChange={handleFilterChange} 
+            roomId={roomId}
           />
-        </Box>
-      </Modal>
-    </div>
+          <Box sx={{ 
+            mt: 2,
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            overflow: 'hidden'
+          }}>
+            <Calendar
+              style={{ 
+                height: 'calc(100vh - 200px)',
+                padding: '20px'
+              }}
+              events={events}
+              defaultView="week"
+              selectable
+              onSelectSlot={openModal}
+              onSelectEvent={(event, e) => reservations.map((reservation) => openEditModal(reservation))}
+              eventPropGetter={eventStyleGetter}
+              allDayAccessor={() => false}
+              showMultiDayTimes
+              endAccessor={({ end }) => new Date((end ?? new Date()).getTime() - 1)}
+            />
+          </Box>
+        </Paper>
+
+        <Modal open={isModalOpen} onClose={closeModal}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              borderRadius: "12px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+              p: 4,
+            }}
+          >
+            <AddReservationComponent
+              start={dayjs(selectedSlot?.start).toDate()}
+              end={dayjs(selectedSlot?.end).toDate()}
+              reservationToUpdate={selectedReservation!}
+              onClose={closeModal}
+            />
+          </Box>
+        </Modal>
+      </Box>
+    </NewNavBar>
   );
 }

@@ -4,13 +4,16 @@ import UserService from "../../services/UserService";
 import { User } from "../../types/user.type";
 import AddUserComponent from "./AddUserComponent";
 import CloseIcon from "@mui/icons-material/Close";
-import NavBar from "../Layout/NavBar";
+import NewNavBar from "../Layout/NewNavBar";
 import CustomTable from "../shared/CustomTable";
 
 function UserComponent() {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
   const columns = [
     { id: 'firstName', label: 'First Name' },
@@ -25,8 +28,11 @@ function UserComponent() {
   };
 
   useEffect(() => {
-    UserService.getUsers().then((data) => setUsers(data));
-  }, []);
+    UserService.getUserListPageable(page, rowsPerPage).then((response) => {
+      setUsers(response.data);
+      setTotalCount(response.totalCount);
+    });
+  }, [page, rowsPerPage]);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -39,15 +45,12 @@ function UserComponent() {
   };
 
   return (
-    <div>
-      <NavBar />
+    <NewNavBar>
       <Paper
         elevation={3}
         style={{
           padding: "20px",
-          margin: "auto",
-          marginTop: "2vh",
-          maxWidth: "90%",
+          margin: "5px 20px 20px 20px",
           backgroundColor: "#f4f6f8",
         }}
       >
@@ -68,6 +71,11 @@ function UserComponent() {
           onEdit={editUser}
           onDelete={(user) => console.log('Delete user', user.id)}
           renderCell={renderCell}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={setPage}
+          onRowsPerPageChange={setRowsPerPage}
+          totalCount={totalCount}
         />
       </Paper>
 
@@ -99,7 +107,7 @@ function UserComponent() {
           <AddUserComponent userToUpdate={selectedUser!} onClose={closeModal} />
         </Box>
       </Modal>
-    </div>
+    </NewNavBar>
   );
 }
 
