@@ -47,5 +47,10 @@ static async getReservationByRoomId(id: number) {
     return response.data;
 }
 
+static async deleteReservation(id: number) {
+    const response = await axios.delete(`${BASE_URL}/reservation/delete/${id}`);
+    return response.data;
+}
+
 }
 export default ReservationService;

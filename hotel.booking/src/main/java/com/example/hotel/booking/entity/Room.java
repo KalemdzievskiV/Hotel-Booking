@@ -24,4 +24,8 @@ public class Room {
     private RoomStatusEnum status;
     private String description;
     private Integer maxCapacity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

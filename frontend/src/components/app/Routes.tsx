@@ -5,14 +5,19 @@ import HomepageComponent from "../HomepageComponent";
 import UserComponent from "../User/UserComponent";
 import RoomComponent from "../Room/RoomComponent";
 import ReservationComponent from "../Reservation/ReservationComponent";
-import NewCalendarComponent from "../Calendar/NewCalendarComponent";
 import TimelineCalendar from "../Calendar/TimelineCalendarComponent";
+import LoginComponent from "../User/LoginComponent";
+import SignupComponent from "../User/SignupComponent";
 
 const AppRoutes = () => {
     return <>
         <Router>
             <Routes>
                 {/* Public routes */}
+                <Route path="/login" element={<LoginComponent/>}/>
+                <Route path="/signup" element={<SignupComponent/>}/>
+                
+                {/* Protected routes */}
                 <Route path="/" element={<HomepageComponent/>}/>
                 <Route path="/calendar" element={<CalendarComponent/>}/>
                 <Route path="/user" element={<UserComponent/>}/>

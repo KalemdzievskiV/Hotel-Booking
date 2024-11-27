@@ -45,6 +45,19 @@ export default function RoomComponent() {
     setSelectedRoom(room);
   };
 
+  const deleteRoom = async (room: Room) => {
+    try {
+      await RoomService.deleteRoom(room.id);
+      // Refresh the room list after deletion
+      RoomService.getRoomListPageable(page, rowsPerPage).then((response) => {
+        setRooms(response.data);
+        setTotalCount(response.totalCount);
+      });
+    } catch (error) {
+      console.error('Error deleting room:', error);
+    }
+  };
+
   return (
     <NewNavBar>
       <Paper
@@ -62,20 +75,23 @@ export default function RoomComponent() {
             onClick={openModal}
             style={{ marginBottom: "20px" }}
           >
-            ADD ROOM
+            Add Room
           </Button>
         </div>
-        
+
         <CustomTable
           columns={columns}
           data={rooms}
           onEdit={editRoom}
-          onDelete={(room) => console.log('Delete room', room.id)}
+          onDelete={deleteRoom}
           renderCell={renderCell}
           page={page}
           rowsPerPage={rowsPerPage}
-          onPageChange={setPage}
-          onRowsPerPageChange={setRowsPerPage}
+          onPageChange={(newPage) => setPage(newPage)}
+          onRowsPerPageChange={(newRowsPerPage) => {
+            setRowsPerPage(newRowsPerPage);
+            setPage(0);
+          }}
           totalCount={totalCount}
         />
       </Paper>

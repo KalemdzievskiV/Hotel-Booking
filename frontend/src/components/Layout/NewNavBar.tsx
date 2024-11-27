@@ -11,7 +11,9 @@ import {
   Paper,
   styled,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Button,
+  Divider
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import HomeIcon from '@mui/icons-material/Home';
@@ -20,7 +22,11 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import EventIcon from '@mui/icons-material/Event';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import mtLogo from '../../assets/mtLogo.png';
+import { authService } from '../../services/authService';
 
 const NavbarContainer = styled(Paper)<{ isopen: string }>(({ theme, isopen }) => ({
   position: 'fixed',
@@ -47,7 +53,9 @@ const NavbarContainer = styled(Paper)<{ isopen: string }>(({ theme, isopen }) =>
 
 const StyledList = styled(List)(({ theme }) => ({
   paddingTop: theme.spacing(2),
-  overflow: 'hidden',
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
   '& .MuiListItem-root': {
     borderRadius: '8px',
     margin: '0 8px 4px 8px',
@@ -143,22 +151,59 @@ const ContentWrapper = styled(Box)<{ isopen: string }>(({ theme, isopen }) => ({
   },
 }));
 
+const AuthContainer = styled(Box)(({ theme }) => ({
+  marginTop: 'auto',
+  borderTop: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(1),
+}));
+
 interface NewNavBarProps {
   children?: React.ReactNode;
+}
+
+interface NavItem {
+  text: string;
+  icon: JSX.Element;
+  path: string;
+}
+
+interface AuthItem {
+  text: string;
+  icon: JSX.Element;
+  path?: string;
+  onClick?: () => void;
 }
 
 const NewNavBar: React.FC<NewNavBarProps> = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   useEffect(() => {
     setIsOpen(false);
   }, [isMobile]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (token && user) {
+      setIsAuthenticated(true);
+      setUserInfo(JSON.parse(user));
+    }
+  }, []);
+
   const navigate = useNavigate();
 
-  const navItems = [
+  const handleLogout = () => {
+    authService.logout();
+    setIsAuthenticated(false);
+    setUserInfo(null);
+    navigate('/login');
+  };
+
+  const navItems: NavItem[] = [
     { text: "Home", icon: <HomeIcon />, path: "/" },
     { text: "Calendar", icon: <CalendarMonthIcon />, path: "/calendar" },
     { text: "Users", icon: <PeopleIcon />, path: "/user" },
@@ -166,6 +211,21 @@ const NewNavBar: React.FC<NewNavBarProps> = ({ children }) => {
     { text: "Reservations", icon: <EventIcon />, path: "/reservation" },
     { text: "New Calendar", icon: <CalendarMonthIcon />, path: "/new-calendar" },
   ];
+
+  const authItems: AuthItem[] = isAuthenticated ? [
+    { text: "Logout", icon: <LogoutIcon />, onClick: handleLogout }
+  ] : [
+    { text: "Login", icon: <LoginIcon />, path: "/login" },
+    { text: "Sign Up", icon: <PersonAddIcon />, path: "/signup" }
+  ];
+
+  const handleAuthItemClick = (item: AuthItem) => {
+    if (item.onClick) {
+      item.onClick();
+    } else if (item.path) {
+      navigate(item.path);
+    }
+  };
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
@@ -237,7 +297,39 @@ const NewNavBar: React.FC<NewNavBarProps> = ({ children }) => {
               </StyledListItemButton>
             </ListItem>
           ))}
+          
+          {isOpen && userInfo && (
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Signed in as:
+              </Typography>
+              <Typography variant="body2" fontWeight="medium">
+                {userInfo.firstName} {userInfo.lastName}
+              </Typography>
+            </Box>
+          )}
         </StyledList>
+
+        <AuthContainer>
+          {authItems.map((item, index) => (
+            <ListItem key={`auth-${index}`} disablePadding>
+              <StyledListItemButton
+                onClick={() => handleAuthItemClick(item)}
+                isopen={isOpen.toString()}
+              >
+                <ListItemIcon>
+                  {item.icon}
+                </ListItemIcon>
+                {isOpen && (
+                  <ListItemText 
+                    primary={item.text}
+                    sx={{ opacity: isOpen ? 1 : 0 }}
+                  />
+                )}
+              </StyledListItemButton>
+            </ListItem>
+          ))}
+        </AuthContainer>
       </NavbarContainer>
       <ContentWrapper isopen={isOpen.toString()}>
         {children}

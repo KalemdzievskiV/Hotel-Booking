@@ -33,7 +33,7 @@ static async updateRoom(room: any) {
     return response.data;
 }
 
-static async deleteUser(id: number) {
+static async deleteRoom(id: number) {
     const response = await axios.delete(`${BASE_URL}/room/delete/${id}`);
     return response.data;
 }

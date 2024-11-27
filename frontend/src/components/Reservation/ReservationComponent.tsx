@@ -89,6 +89,19 @@ export default function ReservationComponent() {
     }
   };
 
+  const deleteReservation = async (reservation: Reservation) => {
+    try {
+      await ReservationService.deleteReservation(reservation.id);
+      // Refresh the reservation list after deletion
+      ReservationService.getReservationsPageable(page, rowsPerPage).then((response) => {
+        setReservations(response.data);
+        setTotalCount(response.totalCount);
+      });
+    } catch (error) {
+      console.error('Error deleting reservation:', error);
+    }
+  };
+
   return (
     <NewNavBar>
       <Paper
@@ -114,7 +127,7 @@ export default function ReservationComponent() {
           columns={columns}
           data={reservations}
           onEdit={editReservation}
-          onDelete={(reservation) => console.log('Delete reservation', reservation.id)}
+          onDelete={deleteReservation}
           renderCell={renderCell}
           page={page}
           rowsPerPage={rowsPerPage}

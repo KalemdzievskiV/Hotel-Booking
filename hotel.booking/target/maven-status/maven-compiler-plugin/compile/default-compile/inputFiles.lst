@@ -6,6 +6,9 @@
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/service/impl/ReservationServiceImpl.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/entity/Room.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/controller/ReservationController.java
+/home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/security/JwtUtil.java
+/home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/controller/AuthController.java
+/home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/security/JwtRequestFilter.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/service/ReservationService.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/service/UserService.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/HotelBookingApplication.java
@@ -13,6 +16,7 @@
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/entity/User.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/controller/RoomController.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/repository/UserRepository.java
+/home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/security/SecurityConfig.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/service/RoomService.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/service/impl/RoomServiceImpl.java
 /home/vladimir/Projects/Hotel-Booking/hotel.booking/src/main/java/com/example/hotel/booking/enums/RoomStatusEnum.java

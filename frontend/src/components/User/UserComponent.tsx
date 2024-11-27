@@ -44,6 +44,19 @@ function UserComponent() {
     setSelectedUser(user);
   };
 
+  const deleteUser = async (user: User) => {
+    try {
+      await UserService.deleteUser(user.id);
+      // Refresh the user list after deletion
+      UserService.getUserListPageable(page, rowsPerPage).then((response) => {
+        setUsers(response.data);
+        setTotalCount(response.totalCount);
+      });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
   return (
     <NewNavBar>
       <Paper
@@ -69,12 +82,15 @@ function UserComponent() {
           columns={columns}
           data={users}
           onEdit={editUser}
-          onDelete={(user) => console.log('Delete user', user.id)}
+          onDelete={deleteUser}
           renderCell={renderCell}
           page={page}
           rowsPerPage={rowsPerPage}
-          onPageChange={setPage}
-          onRowsPerPageChange={setRowsPerPage}
+          onPageChange={(newPage) => setPage(newPage)}
+          onRowsPerPageChange={(newRowsPerPage) => {
+            setRowsPerPage(newRowsPerPage);
+            setPage(0);
+          }}
           totalCount={totalCount}
         />
       </Paper>

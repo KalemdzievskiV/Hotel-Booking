@@ -57,12 +57,10 @@ public class ReservationController {
     @GetMapping("/pageable")
     public ResponseEntity<Page<Reservation>> getReservationsPageable(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "start") String sort,
-            @RequestParam(defaultValue = "desc") String direction) {
+            @RequestParam(defaultValue = "10") int size) {
         
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction.toUpperCase());
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(reservationService.getReservationListPageable(pageable));
     }
 
