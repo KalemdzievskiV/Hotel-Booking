@@ -35,6 +35,11 @@ static async getUserListPageable(page: number = 0, rowsPerPage: number = 10) {
         totalCount: response.data.totalElements
     };
 }
+
+static async getUserByFirstName(firstName: string) {
+    const response = await axios.get(`${BASE_URL}/user/find/firstName/${firstName}`);
+    return response.data;
+}
 }
 
 export default UserService;

@@ -41,12 +41,6 @@ public class RoomServiceImpl implements RoomService {
         Optional.ofNullable(room.getDescription()).ifPresent(newRoom::setDescription);
         Optional.ofNullable(room.getMaxCapacity()).ifPresent(newRoom::setMaxCapacity);
         
-        if (room.getUser() != null && room.getUser().getId() != null) {
-            User user = userRepository.findById(room.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-            user.addRoom(newRoom);
-        }
-        
         return roomRepository.save(newRoom);
     }
 
@@ -60,23 +54,6 @@ public class RoomServiceImpl implements RoomService {
         Optional.ofNullable(room.getStatus()).ifPresent(existingRoom::setStatus);
         Optional.ofNullable(room.getDescription()).ifPresent(existingRoom::setDescription);
         Optional.ofNullable(room.getMaxCapacity()).ifPresent(existingRoom::setMaxCapacity);
-        
-        // Handle user change
-        if (room.getUser() != null && room.getUser().getId() != null) {
-            User newUser = userRepository.findById(room.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-                
-            // Remove from old user if exists
-            if (existingRoom.getUser() != null) {
-                existingRoom.getUser().removeRoom(existingRoom);
-            }
-            
-            // Add to new user
-            newUser.addRoom(existingRoom);
-        } else if (room.getUser() == null && existingRoom.getUser() != null) {
-            // Remove room from user if user is set to null
-            existingRoom.getUser().removeRoom(existingRoom);
-        }
         
         return roomRepository.save(existingRoom);
     }

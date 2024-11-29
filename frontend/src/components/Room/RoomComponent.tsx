@@ -1,5 +1,5 @@
 import NavBar from "../Layout/NavBar";
-import { Box, Button, IconButton, Modal, Paper } from "@mui/material";
+import { Box, Button, Chip, IconButton, Modal, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
 import RoomService from "../../services/RoomService";
 import { Room } from "../../types/room.type";
@@ -19,12 +19,29 @@ export default function RoomComponent() {
   const columns = [
     { id: 'number', label: 'Number', sortable: true },
     { id: 'name', label: 'Name', align: 'center' as const, sortable: true },
-    { id: 'status', label: 'Status', align: 'center' as const, sortable: true },
     { id: 'description', label: 'Description', align: 'center' as const, sortable: true },
     { id: 'maxCapacity', label: 'Max Capacity', align: 'center' as const, sortable: true },
+    { id: 'status', label: 'Status', align: 'center' as const, sortable: true },
   ];
 
   const renderCell = (column: { id: string }, room: Room) => {
+    if (column.id === 'status') {
+      const statusColors = {
+        AVAILABLE: 'success',
+        RESERVED: 'warning',
+        OCCUPIED: 'error',
+        MAINTENANCE: 'default'
+      };
+      
+      return (
+        <Chip
+          label={room.status}
+          color={statusColors[room.status as keyof typeof statusColors] as any}
+          size="small"
+          sx={{ minWidth: '90px' }}
+        />
+      );
+    }
     return room[column.id as keyof Room];
   };
 

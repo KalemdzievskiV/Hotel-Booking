@@ -22,6 +22,7 @@ export default function ReservationComponent() {
     { id: 'finish', label: 'End', align: 'center' as const, sortable: true },
     { id: 'user', label: 'User', align: 'center' as const, sortable: true },
     { id: 'room', label: 'Room', align: 'center' as const, sortable: true },
+    { id: 'status', label: 'Status', align: 'center' as const, sortable: true },
   ];
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function ReservationComponent() {
   const fetchReservations = async () => {
     try {
       const response = await ReservationService.getReservationsPageable(page, rowsPerPage, orderBy, order);
+      console.log('Reservation response:', response.data);
       setReservations(response.data);
       setTotalCount(response.totalCount);
     } catch (error) {
@@ -74,16 +76,68 @@ export default function ReservationComponent() {
     });
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'COMPLETED':
+        return '#fdba74'; // Pastel orange
+      case 'BOOKED':
+        return '#93c5fd'; // Pastel blue
+      case 'CANCELED':
+        return '#fca5a5'; // Pastel red
+      case 'ACTIVE':
+        return '#86efac'; // Pastel green
+      default:
+        return '#e5e7eb'; // Light gray
+    }
+  };
+
   const renderCell = (column: { id: string }, reservation: Reservation) => {
+    if (!reservation) return '';
+    
     switch (column.id) {
       case 'start':
         return formatDate(reservation.start.toString());
       case 'finish':
         return formatDate(reservation.finish.toString());
       case 'user':
-        return reservation.user.firstName;
+        if (!reservation.user) {
+          return <Box sx={{ 
+            color: 'warning.main', 
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}>
+            <span>⚠️</span>
+            <span>Incomplete Reservation</span>
+          </Box>;
+        }
+        return `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() || 'Unknown User';
       case 'room':
-        return reservation.room.description;
+        if (!reservation.room) {
+          return <Box sx={{ 
+            color: 'warning.main',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}>
+            <span>⚠️</span>
+            <span>No Room Assigned</span>
+          </Box>;
+        }
+        return `Room ${reservation.room.number} - ${reservation.room.name}`;
+      case 'status':
+        return <Box sx={{ 
+          backgroundColor: getStatusColor(reservation.status),
+          color: '#374151',
+          py: 0.5,
+          px: 1.5,
+          borderRadius: '16px',
+          display: 'inline-block',
+          fontSize: '0.875rem',
+          fontWeight: 500
+        }}>
+          {reservation.status}
+        </Box>;
       default:
         return '';
     }

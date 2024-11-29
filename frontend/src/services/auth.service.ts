@@ -36,6 +36,7 @@ export const authService = {
 
             // Create a user object from the response data
             const userData = {
+                id: response.data.id,
                 email: response.data.email,
                 firstName: response.data.firstName,
                 lastName: response.data.lastName,

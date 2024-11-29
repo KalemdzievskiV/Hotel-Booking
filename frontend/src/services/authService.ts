@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { idText } from 'typescript';
 
 const API_URL = 'http://localhost:8080/auth';
 
@@ -20,6 +21,7 @@ export const authService = {
         console.log('Login response:', response.data);
         
         const userData = {
+            id: response.data.id,
             email: response.data.email,
             firstName: response.data.firstName,
             lastName: response.data.lastName,

@@ -77,20 +77,27 @@ export default function CalendarComponent() {
     }
   };
 
-  const events = reservations.map((reservation) => ({
-    start: new Date(reservation.start),
-    end: new Date(reservation.finish),
-    title:
-      "Room: " +
-      reservation.room.number +
-      " - User: " +
-      reservation.user.firstName,
-    color:  
-      reservation.status === ReservationStatus.ACTIVE ? "#86efac" :    // Pastel green
-      reservation.status === ReservationStatus.COMPLETED ? "#fdba74" : // Pastel orange
-      reservation.status === ReservationStatus.CANCELED ? "#fca5a5" :  // Pastel red
-      "#93c5fd",  // Pastel blue (default)
-  }));
+  interface CalendarEvent {
+    start: Date;
+    end: Date;
+    title: string;
+    color: string;
+  }
+
+  const events: CalendarEvent[] = reservations
+    .filter((reservation): reservation is Reservation => {
+      return !!reservation && !!reservation.room && !!reservation.user;
+    })
+    .map((reservation) => ({
+      start: new Date(reservation.start),
+      end: new Date(reservation.finish),
+      title: `Room: ${reservation.room.number || 'Unknown'} - User: ${reservation.user.firstName || 'Unknown'}`,
+      color:  
+        reservation.status === ReservationStatus.ACTIVE ? "#86efac" :    // Pastel green
+        reservation.status === ReservationStatus.COMPLETED ? "#fdba74" : // Pastel orange
+        reservation.status === ReservationStatus.CANCELED ? "#fca5a5" :  // Pastel red
+        "#93c5fd",  // Pastel blue (default)
+    }));
 
   const eventStyleGetter = (event: any) => {
     return {

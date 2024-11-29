@@ -27,17 +27,8 @@ public class User {
     private String email;
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Room> rooms = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Room> rooms;
 
-    // Helper methods to maintain bidirectional relationship
-    public void addRoom(Room room) {
-        rooms.add(room);
-        room.setUser(this);
-    }
 
-    public void removeRoom(Room room) {
-        rooms.remove(room);
-        room.setUser(null);
-    }
 }

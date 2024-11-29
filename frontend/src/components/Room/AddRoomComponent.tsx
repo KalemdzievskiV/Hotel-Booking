@@ -3,10 +3,12 @@ import { Button, MenuItem, TextField, Typography } from "@mui/material";
 import RoomService from "../../services/RoomService";
 import UserRole from "../../enum/user.enum";
 import RoomStatus from "../../enum/room/room.status.enum";
+import UserService from "../../services/UserService";
 
 interface AddRoomComponentProps {
   onClose: () => void;
   roomToUpdate?: {
+    id: number;
     number: string;
     name: string;
     status: string;
@@ -20,6 +22,7 @@ export default function AddRoomComponent({
   roomToUpdate,
 }: AddRoomComponentProps) {
   const [room, setRoom] = useState({
+    id: 0,
     number: "",
     name: "",
     status: "",
@@ -43,18 +46,34 @@ export default function AddRoomComponent({
     setRoom({ ...room, [name]: value });
   };
 
-  const handleAddRoom = () => {
-    RoomService.createNewRoom(room);
-    // After successful addition, close the modal and refresh the page
-    onClose();
-    window.location.reload();
-  };
+  const handleAddRoom = async () => {
+    const userJson = localStorage.getItem('user');
+    const user = userJson ? JSON.parse(userJson) : null;
 
-  const handleEditRoom = () => {
-    RoomService.updateRoom(room);
-    // After successful update, close the modal and refresh the page
-    onClose();
-    window.location.reload();
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+
+    const roomData = {
+      ...room,
+      user: {
+        id: user.id  // Only send the user ID
+      }
+    };
+
+    try {
+      if (isEditing && roomToUpdate) {
+        await RoomService.updateRoom(roomData);
+      } else {
+        const { id, ...newRoomData } = roomData; // Remove id when creating new room
+        await RoomService.createNewRoom(newRoomData);
+      }
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error('Error saving room:', error);
+    }
   };
 
   return (
@@ -119,7 +138,7 @@ export default function AddRoomComponent({
         <Button
           variant="contained"
           color="primary"
-          onClick={isEditing ? handleEditRoom : handleAddRoom}
+          onClick={handleAddRoom}
         >
           {isEditing ? "Update Room" : "Add Room"}
         </Button>
