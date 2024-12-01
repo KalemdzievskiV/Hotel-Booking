@@ -1,6 +1,7 @@
 package com.example.hotel.booking.entity;
 
 import com.example.hotel.booking.enums.UserRoleEnum;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +28,7 @@ public class User {
     private String email;
     private String password;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Room> rooms;
-
-
 }

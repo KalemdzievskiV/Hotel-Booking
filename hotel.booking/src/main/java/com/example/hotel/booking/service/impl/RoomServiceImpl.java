@@ -40,6 +40,7 @@ public class RoomServiceImpl implements RoomService {
         Optional.ofNullable(room.getStatus()).ifPresent(newRoom::setStatus);
         Optional.ofNullable(room.getDescription()).ifPresent(newRoom::setDescription);
         Optional.ofNullable(room.getMaxCapacity()).ifPresent(newRoom::setMaxCapacity);
+        Optional.ofNullable(room.getUser()).ifPresent(newRoom::setUser);
         
         return roomRepository.save(newRoom);
     }

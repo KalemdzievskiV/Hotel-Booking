@@ -210,6 +210,7 @@ const NewNavBar: React.FC<NewNavBarProps> = ({ children }) => {
     { text: "Rooms", icon: <MeetingRoomIcon />, path: "/room" },
     { text: "Reservations", icon: <EventIcon />, path: "/reservation" },
     { text: "New Calendar", icon: <CalendarMonthIcon />, path: "/new-calendar" },
+    { text: "Dashboard", icon: <HomeIcon />, path: "/dashboard" },
   ];
 
   const authItems: AuthItem[] = isAuthenticated ? [

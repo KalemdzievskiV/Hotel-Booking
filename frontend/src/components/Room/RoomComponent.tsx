@@ -8,6 +8,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import CustomTable from "../shared/CustomTable";
 import NewNavBar from "../Layout/NewNavBar";
 
+interface Column {
+  id: string;
+  label: string;
+  align?: 'left' | 'center' | 'right';
+  sortable?: boolean;
+}
+
 export default function RoomComponent() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,33 +23,40 @@ export default function RoomComponent() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
 
-  const columns = [
+  const columns: Column[] = [
     { id: 'number', label: 'Number', sortable: true },
-    { id: 'name', label: 'Name', align: 'center' as const, sortable: true },
-    { id: 'description', label: 'Description', align: 'center' as const, sortable: true },
-    { id: 'maxCapacity', label: 'Max Capacity', align: 'center' as const, sortable: true },
-    { id: 'status', label: 'Status', align: 'center' as const, sortable: true },
+    { id: 'name', label: 'Name', align: 'center', sortable: true },
+    { id: 'description', label: 'Description', align: 'center', sortable: true },
+    { id: 'maxCapacity', label: 'Max Capacity', align: 'center', sortable: true },
+    { id: 'status', label: 'Status', align: 'center', sortable: true },
+    { id: 'images', label: 'Images', align: 'center', sortable: true },
   ];
 
-  const renderCell = (column: { id: string }, room: Room) => {
-    if (column.id === 'status') {
-      const statusColors = {
-        AVAILABLE: 'success',
-        RESERVED: 'warning',
-        OCCUPIED: 'error',
-        MAINTENANCE: 'default'
-      };
-      
-      return (
-        <Chip
-          label={room.status}
-          color={statusColors[room.status as keyof typeof statusColors] as any}
-          size="small"
-          sx={{ minWidth: '90px' }}
-        />
-      );
+  const renderCell = (column: Column, room: Room): React.ReactNode => {
+    switch (column.id) {
+      case 'status':
+        const statusColors = {
+          AVAILABLE: 'success',
+          RESERVED: 'warning',
+          OCCUPIED: 'error',
+          MAINTENANCE: 'default'
+        } as const;
+        
+        return (
+          <Chip
+            label={room.status}
+            color={statusColors[room.status as keyof typeof statusColors]}
+            size="small"
+            sx={{ minWidth: '90px' }}
+          />
+        );
+      case 'images':
+        if (!room.images) return 'No images';
+        return `${room.images.length} images`;
+      default:
+        const value = room[column.id as keyof Room];
+        return value?.toString() ?? '';
     }
-    return room[column.id as keyof Room];
   };
 
   useEffect(() => {

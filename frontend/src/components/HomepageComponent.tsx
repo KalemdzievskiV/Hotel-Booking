@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NewNavBar from "./Layout/NewNavBar";
 import {
   Button,
@@ -23,6 +24,7 @@ import testImage from '../assets/test.jpeg';
 import { Box } from "@mui/material";
 
 function HomepageComponent() {
+  const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [title, setTitle] = useState<string>("All Available Rooms");
   const [selectedTime, setSelectedTime] = useState<Date>(new Date());
@@ -71,7 +73,11 @@ function HomepageComponent() {
   };
 
   const redirectToCalendar = (roomId: number) => {
-    window.location.href = `/calendar?roomId=${roomId}`;
+    navigate(`/calendar?roomId=${roomId}`);
+  };
+
+  const handleRoomClick = (roomId: number) => {
+    navigate(`/room/${roomId}`);
   };
 
   return (
@@ -192,17 +198,16 @@ function HomepageComponent() {
                   <Card
                     key={room.id}
                     sx={{
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      minWidth: "250px",
-                      maxWidth: "800px", // Increased width
-                      margin: "0 auto",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      cursor: "pointer", // Add cursor pointer
                       "&:hover": {
-                        boxShadow: "0 4px 6px rgba(0,0,0,0.08)",
+                        transform: "scale(1.02)",
+                        transition: "transform 0.2s ease-in-out",
                       },
-                      transition: "box-shadow 0.3s ease-in-out",
                     }}
+                    onClick={() => handleRoomClick(room.id)}
                   >
                     <CardMedia
                       sx={{
@@ -237,30 +242,20 @@ function HomepageComponent() {
                     </CardContent>
                     <CardActions
                       sx={{
-                        padding: "8px 16px 16px",
+                        justifyContent: "space-between",
                         alignItems: "center",
-                        alignContent: "center",
-                        justifyContent: "center",
+                        p: 2,
                       }}
                     >
                       <Button
-                        sx={{
-                          textTransform: "none",
-                          color: "#1a73e8",
-                          fontWeight: 600,
-                          fontSize: "0.875rem",
-                          border: "1px solid #1a73e8",
-                          borderRadius: "4px",
-                          padding: "6px 16px",
-                          "&:hover": {
-                            background: "none",
-                            color: "#174ea6",
-                            borderColor: "#174ea6",
-                          },
+                        size="small"
+                        variant="outlined"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click
+                          redirectToCalendar(room.id);
                         }}
-                        onClick={() => redirectToCalendar(room.id)}
                       >
-                        Book Appointment
+                        View Calendar
                       </Button>
                     </CardActions>
                   </Card>

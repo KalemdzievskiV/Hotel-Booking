@@ -111,6 +111,8 @@ const TimelineCalendarComponent: React.FC = () => {
   const [dragStart, setDragStart] = useState<{ roomId: number; slotIndex: number } | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<TimeSelection | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [isReservationDialogOpen, setIsReservationDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -370,6 +372,27 @@ const TimelineCalendarComponent: React.FC = () => {
     });
   };
 
+  const handleReservationClick = (reservation: Reservation) => {
+    setSelectedReservation(reservation);
+    setIsReservationDialogOpen(true);
+  };
+
+  const handleCloseReservationDialog = () => {
+    setIsReservationDialogOpen(false);
+    setSelectedReservation(null);
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <NewNavBar />
@@ -451,7 +474,7 @@ const TimelineCalendarComponent: React.FC = () => {
                         sx={{
                           width: '32px',
                           minWidth: '32px',
-                          borderRight: '1px solid #e0e0e0',
+                          borderRight: '1px solid #e0f0f0',
                           p: 1,
                           textAlign: 'center',
                           backgroundColor: index % 2 === 0 ? 'inherit' : 'rgba(0, 0, 0, 0.02)',
@@ -615,6 +638,7 @@ const TimelineCalendarComponent: React.FC = () => {
                                     },
                                   }}
                                   title={`${reservation.user.firstName || 'Unknown'} - ${startTime.toLocaleTimeString()} to ${endTime.toLocaleTimeString()} (${reservation.status})`}
+                                  onClick={() => handleReservationClick(reservation)}
                                 >
                                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography variant="caption" sx={{ fontSize: 'inherit' }}>
@@ -658,6 +682,7 @@ const TimelineCalendarComponent: React.FC = () => {
                                 <ReservationBlock
                                   status={'confirmed'}
                                   sx={getReservationStyle(reservation)}
+                                  onClick={() => handleReservationClick(reservation)}
                                 >
                                   {reservation.user.firstName || 'Unknown'}
                                 </ReservationBlock>
@@ -700,6 +725,52 @@ const TimelineCalendarComponent: React.FC = () => {
               selectedRoom={rooms.find(r => r.id === selectedSlots.roomId) as Room | undefined}
             />
           )}
+        </Dialog>
+
+        {/* Reservation Details Dialog */}
+        <Dialog
+          open={isReservationDialogOpen}
+          onClose={handleCloseReservationDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            Reservation Details
+          </DialogTitle>
+          <DialogContent>
+            {selectedReservation && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Guest:</strong> {selectedReservation.user.firstName} {selectedReservation.user.lastName}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Room:</strong> {selectedReservation.room.name} (#{selectedReservation.room.number})
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Check-in:</strong> {formatDateTime(selectedReservation.start)}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Check-out:</strong> {formatDateTime(selectedReservation.finish)}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Status:</strong>{' '}
+                  <Box
+                    component="span"
+                    sx={{
+                      color: selectedReservation.status === 'confirmed' ? 'success.main' :
+                             selectedReservation.status === 'pending' ? 'warning.main' : 'info.main',
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {selectedReservation.status}
+                  </Box>
+                </Typography>
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseReservationDialog}>Close</Button>
+          </DialogActions>
         </Dialog>
       </MainContent>
     </Box>
