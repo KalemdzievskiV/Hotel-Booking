@@ -88,6 +88,12 @@ public class RoomController {
         return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
+    @GetMapping("/find/user/{userId}")
+    public ResponseEntity<List<Room>> ListRoomByUser(@PathVariable("userId") Long userId) {
+        List<Room> rooms = roomService.getRoomListByUser(userId);
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
     @DeleteMapping("/delete/{id}")
     public void deleteRoom(@PathVariable("id") Long id) {
         roomService.deleteRoom(id);

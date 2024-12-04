@@ -13,6 +13,7 @@ public interface RoomService {
     public Room updateRoom(Room room);
     public Room getRoomById(Long id);
     public List<Room> getRoomList();
+    public List<Room> getRoomListByUser(Long userId);
     public Page<Room> getRoomListPageable(Pageable pageable);
     public Room getRoomByNumber(String number);
     public List<Room> getRoomByStatus(RoomStatusEnum status);

@@ -9,4 +9,6 @@ import java.util.List;
 public interface RoomRepository extends JpaRepository<Room, Long> {
     Room findRoomByNumber(String number);
     List<Room> findByStatus(RoomStatusEnum status);
+    List<Room> findByUserId(Long userId);
+
 }

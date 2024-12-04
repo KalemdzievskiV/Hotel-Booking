@@ -70,6 +70,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public List<Room> getRoomListByUser(Long userId){
+        return roomRepository.findByUserId(userId);
+    }
+
+    @Override
     public Room getRoomByNumber(String number) {
         return roomRepository.findRoomByNumber(number);
     }
