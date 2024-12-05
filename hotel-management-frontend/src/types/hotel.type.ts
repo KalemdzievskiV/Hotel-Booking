@@ -1,3 +1,5 @@
+import { User } from "./user.type";
+
 export interface Hotel {
     id?: number;
     name: string;
@@ -9,4 +11,5 @@ export interface Hotel {
     amenities: string[];
     pictures: string[];
     averageRating: number;
+    admin_id: number;  
 }

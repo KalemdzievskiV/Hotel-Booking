@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
@@ -61,7 +61,7 @@ public class AuthController {
         String originalPassword = user.getPassword();
 
         user.setMemberSince(LocalDateTime.now());
-        user.setUserRole(UserRoleEnum.USER); // Default role
+        user.setUserRole(UserRoleEnum.SUPER_ADMIN); // Default role
 
         User savedUser = userService.createUser(user);
 

@@ -1,6 +1,7 @@
 package com.example.hotel_management.entity;
 
 import com.example.hotel_management.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,5 +45,6 @@ public class User {
     private boolean active = true;
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Hotel> hotels;
 }

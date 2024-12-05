@@ -31,16 +31,18 @@ public class AuthService {
 
     public Map<String, String> login(User loginRequest) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
         
-        User user = userRepository.findByUsername(loginRequest.getUsername())
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getEmail());
         
         Map<String, String> response = new HashMap<>();
+        response.put("id", String.valueOf(user.getId()));
         response.put("token", token);
+        response.put("email", user.getEmail());
         response.put("username", user.getUsername());
         response.put("role", user.getRole().name());
         
@@ -56,17 +58,18 @@ public class AuthService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(UserRole.GUEST);
+        user.setRole(UserRole.SUPER_ADMIN);
         user.setActive(true);
         
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(savedUser.getEmail());
         
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
-        response.put("username", user.getUsername());
-        response.put("role", user.getRole().name());
+        response.put("email", savedUser.getEmail());
+        response.put("username", savedUser.getUsername());
+        response.put("role", savedUser.getRole().name());
         
         return response;
     }
