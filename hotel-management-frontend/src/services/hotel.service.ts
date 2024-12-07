@@ -50,4 +50,16 @@ export class HotelService {
         console.log('Search hotels response:', response.data);
         return response.data;
     }
+
+    static async getCurrentUserHotel(): Promise<Hotel | null> {
+        try {
+            console.log('Fetching current user\'s hotel...');
+            const response = await api.get(`${this.BASE_PATH}/current`);
+            console.log('Get current user\'s hotel response:', response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error getting current user\'s hotel:', error.response?.data || error.message);
+            return null;
+        }
+    }
 }

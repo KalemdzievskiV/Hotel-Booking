@@ -5,6 +5,9 @@ import { HomePageComponent } from './components/home-page/HomePageComponent';
 import AuthPage from './components/auth/AuthPage';
 import Dashboard from './components/dashboard/Dashboard';
 import HotelComponent from './components/hotels/HotelComponent';
+import UsersPage from './pages/UsersPage';
+import RoomsPage from './pages/RoomsPage';
+import CalendarPage from './pages/CalendarPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import theme from './theme/theme';
 
@@ -27,6 +30,21 @@ function App() {
           <Route path="/hotels" element={
             <ProtectedRoute>
               <HotelComponent />
+            </ProtectedRoute>
+          } />
+          <Route path="/users" element={
+            <ProtectedRoute>
+              <UsersPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms" element={
+            <ProtectedRoute>
+              <RoomsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/calendar" element={
+            <ProtectedRoute>
+              <CalendarPage />
             </ProtectedRoute>
           } />
           <Route path="/bookings" element={

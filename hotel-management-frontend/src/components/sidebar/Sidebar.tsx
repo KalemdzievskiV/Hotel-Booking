@@ -52,6 +52,9 @@ const Sidebar = () => {
   const NavItems = [
     { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
     { name: 'Hotels', icon: FiMapPin, path: '/hotels' },
+    { name: 'Rooms', icon: FiHome, path: '/rooms' },
+    { name: 'Calendar', icon: FiCalendar, path: '/calendar' },
+    { name: 'Users', icon: FiUsers, path: '/users' },
     { name: 'Bookings', icon: FiCalendar, path: '/bookings' },
     { name: 'Guests', icon: FiUsers, path: '/guests' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },

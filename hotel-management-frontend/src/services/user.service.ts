@@ -1,15 +1,37 @@
 import { api } from './api.config';
-import { User } from '../types/user.type';
+import { User, UserRole } from '../types/user.type';
+
+interface CreateUserDTO {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    role: UserRole;
+    active: boolean;
+}
+
+interface UpdateUserDTO {
+    firstName: string;
+    lastName: string;
+    username: string;
+    password?: string; 
+    email: string;
+    phoneNumber: string;
+    role: UserRole;
+    active: boolean;
+}
 
 export class UserService {
     private static readonly BASE_PATH = '/users';
 
-    static async createUser(user: User): Promise<User> {
+    static async createUser(user: CreateUserDTO): Promise<User> {
         const response = await api.post(this.BASE_PATH, user);
         return response.data;
     }
 
-    static async updateUser(id: number, user: User): Promise<User> {
+    static async updateUser(id: number, user: UpdateUserDTO): Promise<User> {
         const response = await api.put(`${this.BASE_PATH}/${id}`, user);
         return response.data;
     }

@@ -4,6 +4,7 @@ import com.example.hotel_management.entity.User;
 import com.example.hotel_management.repository.UserRepository;
 import com.example.hotel_management.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,15 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User createUser(User user) {
         if (existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
+        // Encode password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -34,6 +38,12 @@ public class UserServiceImpl implements UserService {
         existingUser.setPhoneNumber(user.getPhoneNumber());
         existingUser.setUsername(user.getUsername());
         existingUser.setRole(user.getRole());
+        
+        // Only update password if it's provided
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
         return userRepository.save(existingUser);
     }
 

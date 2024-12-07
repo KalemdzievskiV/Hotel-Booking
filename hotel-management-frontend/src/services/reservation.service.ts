@@ -1,10 +1,10 @@
 import { api } from './api.config';
-import { Reservation } from '../types/reservation.type';
+import { Reservation, CreateReservationDTO } from '../types/reservation.type';
 
 export class ReservationService {
     private static readonly BASE_PATH = '/reservations';
 
-    static async createReservation(reservation: Reservation): Promise<Reservation> {
+    static async createReservation(reservation: CreateReservationDTO): Promise<Reservation> {
         const response = await api.post(this.BASE_PATH, reservation);
         return response.data;
     }

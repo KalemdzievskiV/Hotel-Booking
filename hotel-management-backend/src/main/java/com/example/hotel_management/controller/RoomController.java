@@ -4,6 +4,7 @@ import com.example.hotel_management.entity.Room;
 import com.example.hotel_management.enums.RoomStatus;
 import com.example.hotel_management.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -23,12 +24,24 @@ public class RoomController {
         this.roomService = roomService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        "application/json;charset=UTF-8"
+    }, produces = {
+        MediaType.APPLICATION_JSON_VALUE,
+        "application/json;charset=UTF-8"
+    })
     public ResponseEntity<Room> createRoom(@Valid @RequestBody Room room) {
         return ResponseEntity.ok(roomService.createRoom(room));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(
+        value = "/{id}",
+        consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            "application/json;charset=UTF-8"
+        }
+    )
     public ResponseEntity<Room> updateRoom(
             @PathVariable Long id,
             @Valid @RequestBody Room room) {

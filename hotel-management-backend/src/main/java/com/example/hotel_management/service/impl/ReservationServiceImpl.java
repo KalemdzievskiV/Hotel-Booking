@@ -128,15 +128,15 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalArgumentException("Check-in time must be before check-out time");
         }
         
-        if (reservation.getCheckInTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Check-in time cannot be in the past");
-        }
+//        if (reservation.getCheckInTime().isBefore(LocalDateTime.now())) {
+//            throw new IllegalArgumentException("Check-in time cannot be in the past");
+//        }
         
         // Ensure minimum stay duration
-        if (ChronoUnit.HOURS.between(reservation.getCheckInTime(), 
-                                   reservation.getCheckOutTime()) < 24) {
-            throw new IllegalArgumentException("Minimum stay duration is 1 day");
-        }
+//        if (ChronoUnit.HOURS.between(reservation.getCheckInTime(),
+//                                   reservation.getCheckOutTime()) < 24) {
+//            throw new IllegalArgumentException("Minimum stay duration is 1 day");
+//        }
     }
 
     private void validateStatusTransition(ReservationStatus currentStatus, ReservationStatus newStatus) {

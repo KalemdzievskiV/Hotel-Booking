@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.Set;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "hotels")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Hotel {
 
     @Id
@@ -54,16 +54,20 @@ public class Hotel {
     @Column(nullable = false)
     private Integer totalReviews = 0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"hotels", "password", "hibernateLazyInitializer", "handler"})
     private User admin;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hotel", "hibernateLazyInitializer", "handler"})
     private Set<Room> rooms;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hotel", "hibernateLazyInitializer", "handler"})
+    private Set<Reservation> reservations;
+
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hotel", "hibernateLazyInitializer", "handler"})
     private Set<Subscription> subscriptions;
 }

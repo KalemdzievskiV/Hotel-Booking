@@ -1,5 +1,6 @@
 package com.example.hotel_management.controller;
 
+import com.example.hotel_management.dto.LoginRequest;
 import com.example.hotel_management.entity.User;
 import com.example.hotel_management.service.AuthService;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody User loginRequest) {
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 

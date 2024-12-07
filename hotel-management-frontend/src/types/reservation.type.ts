@@ -10,6 +10,18 @@ export enum ReservationStatus {
     CANCELLED = 'CANCELLED'
 }
 
+// Type for creating a new reservation
+export interface CreateReservationDTO {
+    room: { id: number };
+    hotel: { id: number };
+    guest: { id: number };
+    checkInTime: string;
+    checkOutTime: string;
+    totalPrice: number;
+    specialRequests?: string;
+    status: ReservationStatus;
+}
+
 export interface Reservation {
     id?: number;
     room: Room;

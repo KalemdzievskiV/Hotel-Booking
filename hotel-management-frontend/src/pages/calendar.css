@@ -1,0 +1,112 @@
+.fc {
+  font-family: var(--chakra-fonts-body);
+}
+
+/* Calendar header and buttons */
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 1.5em;
+}
+
+.fc .fc-button-primary {
+  background-color: #2B6CB0;
+  border-color: #2B6CB0;
+}
+
+.fc .fc-button-primary:not(:disabled):hover {
+  background-color: #2C5282;
+  border-color: #2C5282;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #1A365D;
+  border-color: #1A365D;
+}
+
+/* Calendar grid and cells */
+.fc .fc-scrollgrid {
+  border-color: #E2E8F0;
+}
+
+.fc th {
+  border-color: #E2E8F0;
+  background-color: #F7FAFC;
+  padding: 8px;
+}
+
+.fc td {
+  border-color: #E2E8F0;
+}
+
+/* Time grid specific */
+.fc .fc-timegrid-slot {
+  height: 1.8rem !important;
+}
+
+.fc .fc-timegrid-slot-label {
+  font-size: 0.75rem;
+  color: #4A5568;
+  vertical-align: middle;
+}
+
+/* Today column highlight */
+.fc .fc-day-today {
+  background-color: #EBF8FF !important;
+}
+
+/* Current time indicator */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #E53E3E;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #E53E3E;
+}
+
+/* Resource area (room names) */
+.fc-resource-timeline .fc-resource-group,
+.fc .fc-resource-area td {
+  background-color: #F7FAFC;
+}
+
+.fc .fc-resource-timeline-divider {
+  background-color: #E2E8F0;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .fc {
+  color: #E2E8F0;
+}
+
+[data-theme="dark"] .fc-button-primary {
+  background-color: #4299E1;
+  border-color: #4299E1;
+}
+
+[data-theme="dark"] .fc th {
+  background-color: #2D3748;
+  border-color: #4A5568;
+}
+
+[data-theme="dark"] .fc td {
+  border-color: #4A5568;
+}
+
+[data-theme="dark"] .fc .fc-day-today {
+  background-color: #2A4365 !important;
+}
+
+[data-theme="dark"] .fc-timegrid-slot-label {
+  color: #A0AEC0;
+}
+
+/* Selection highlight */
+.fc-highlight {
+  background-color: rgba(66, 153, 225, 0.2) !important;
+}
+
+/* Adjust time labels for smaller slots */
+.fc .fc-timegrid-axis-cushion {
+  padding: 2px 4px;
+  font-size: 0.75rem;
+}

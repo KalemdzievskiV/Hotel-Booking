@@ -1,5 +1,6 @@
 package com.example.hotel_management.service.impl;
 
+import com.example.hotel_management.dto.HotelResponseDTO;
 import com.example.hotel_management.entity.Hotel;
 import com.example.hotel_management.repository.HotelRepository;
 import com.example.hotel_management.service.HotelService;
@@ -7,19 +8,57 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class HotelServiceImpl implements HotelService {
 
     private final HotelRepository hotelRepository;
 
+    private HotelResponseDTO convertToDTO(Hotel hotel) {
+        if (hotel == null) {
+            return null;
+        }
+        
+        HotelResponseDTO dto = new HotelResponseDTO();
+        dto.setId(hotel.getId());
+        dto.setName(hotel.getName());
+        dto.setAddress(hotel.getAddress());
+        dto.setDescription(hotel.getDescription());
+        dto.setPhoneNumber(hotel.getPhoneNumber());
+        dto.setEmail(hotel.getEmail());
+        dto.setStarRating(hotel.getStarRating());
+        dto.setAmenities(hotel.getAmenities());
+        dto.setPictures(hotel.getPictures());
+        dto.setAverageRating(hotel.getAverageRating());
+        dto.setTotalReviews(hotel.getTotalReviews());
+        if (hotel.getAdmin() != null) {
+            dto.setAdminId(hotel.getAdmin().getId());
+            dto.setAdminEmail(hotel.getAdmin().getEmail());
+        }
+        return dto;
+    }
+
+    private void validateHotelData(Hotel hotel) {
+        if (hotel.getName() == null || hotel.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Hotel name cannot be empty");
+        }
+        if (hotel.getEmail() == null || hotel.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Hotel email cannot be empty");
+        }
+        if (hotel.getStarRating() != null && (hotel.getStarRating() < 1 || hotel.getStarRating() > 5)) {
+            throw new IllegalArgumentException("Star rating must be between 1 and 5");
+        }
+    }
+
     @Override
-    public Hotel createHotel(Hotel hotel) {
+    public HotelResponseDTO createHotel(Hotel hotel) {
         if (hotelRepository.existsByEmailIgnoreCase(hotel.getEmail())) {
             throw new IllegalStateException("Hotel with this email already exists");
         }
@@ -29,19 +68,32 @@ public class HotelServiceImpl implements HotelService {
         if (hotel.getTotalReviews() == null) hotel.setTotalReviews(0);
         
         validateHotelData(hotel);
-        return hotelRepository.save(hotel);
+        
+        Hotel savedHotel = hotelRepository.save(hotel);
+        log.info("Created new hotel with ID: {}", savedHotel.getId());
+        return convertToDTO(savedHotel);
     }
 
     @Override
-    public Hotel updateHotel(Long id, Hotel hotel) {
-        Hotel existingHotel = getHotelById(id);
+    @Transactional(readOnly = true)
+    public HotelResponseDTO getHotelByAdminId(Long adminId) {
+        return hotelRepository.findByAdminId(adminId)
+            .stream()
+            .findFirst()
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new EntityNotFoundException("No hotel found for admin with ID: " + adminId));
+    }
+
+    @Override
+    public HotelResponseDTO updateHotel(Long id, Hotel hotel) {
+        Hotel existingHotel = hotelRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Hotel not found with id: " + id));
         
-        // Check email uniqueness if it's being changed
-        if (!existingHotel.getEmail().equalsIgnoreCase(hotel.getEmail()) 
+        if (!existingHotel.getEmail().equals(hotel.getEmail()) 
             && hotelRepository.existsByEmailIgnoreCase(hotel.getEmail())) {
             throw new IllegalStateException("Hotel with this email already exists");
         }
-        
+
         validateHotelData(hotel);
         
         existingHotel.setName(hotel.getName());
@@ -53,23 +105,9 @@ public class HotelServiceImpl implements HotelService {
         existingHotel.setAmenities(hotel.getAmenities());
         existingHotel.setPictures(hotel.getPictures());
         
-        return hotelRepository.save(existingHotel);
-    }
-
-    @Override
-    public Hotel getHotelById(Long id) {
-        return hotelRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Hotel not found with id: " + id));
-    }
-
-    @Override
-    public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll();
-    }
-
-    @Override
-    public List<Hotel> getHotelsByAdminId(Long adminId) {
-        return hotelRepository.findByAdminId(adminId);
+        Hotel updatedHotel = hotelRepository.save(existingHotel);
+        log.info("Updated hotel with ID: {}", updatedHotel.getId());
+        return convertToDTO(updatedHotel);
     }
 
     @Override
@@ -78,87 +116,44 @@ public class HotelServiceImpl implements HotelService {
             throw new EntityNotFoundException("Hotel not found with id: " + id);
         }
         hotelRepository.deleteById(id);
+        log.info("Deleted hotel with ID: {}", id);
     }
 
     @Override
-    public List<Hotel> searchHotels(String keyword) {
+    @Transactional(readOnly = true)
+    public HotelResponseDTO getHotelById(Long id) {
+        return hotelRepository.findById(id)
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new EntityNotFoundException("Hotel not found with id: " + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<HotelResponseDTO> getAllHotels() {
+        try {
+            List<Hotel> hotels = hotelRepository.findAll();
+            log.debug("Retrieved {} hotels from database", hotels.size());
+            return hotels.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error fetching all hotels: {}", e.getMessage(), e);
+            throw new RuntimeException("Error fetching hotels: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<HotelResponseDTO> searchHotels(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllHotels();
         }
         String searchTerm = keyword.trim();
-        return hotelRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-            searchTerm, searchTerm, searchTerm
-        );
-    }
-
-    @Override
-    public List<Hotel> findByStarRating(Integer starRating) {
-        validateStarRating(starRating);
-        return hotelRepository.findByStarRating(starRating);
-    }
-
-    @Override
-    public List<Hotel> findByAverageRatingGreaterThanEqual(Double rating) {
-        validateRating(rating);
-        return hotelRepository.findByAverageRatingGreaterThanEqual(rating);
-    }
-
-    @Override
-    public List<Hotel> findByStarRatingAndAverageRating(Integer minStars, Double minRating) {
-        validateStarRating(minStars);
-        validateRating(minRating);
-        return hotelRepository.findByStarRatingAndAverageRating(minStars, minRating);
-    }
-
-    @Override
-    public List<Hotel> findByAmenity(String amenity) {
-        if (amenity == null || amenity.trim().isEmpty()) {
-            throw new IllegalArgumentException("Amenity cannot be empty");
-        }
-        return hotelRepository.findByAmenity(amenity.trim());
-    }
-
-    @Override
-    public List<Hotel> findTopRatedHotels(Double minRating) {
-        validateRating(minRating);
-        return hotelRepository.findTopRatedHotels(minRating);
-    }
-
-    @Override
-    public void updateHotelRating(Long id, Double newRating) {
-        validateRating(newRating);
-        Hotel hotel = getHotelById(id);
-        Double currentTotal = hotel.getAverageRating() * hotel.getTotalReviews();
-        hotel.setTotalReviews(hotel.getTotalReviews() + 1);
-        hotel.setAverageRating((currentTotal + newRating) / hotel.getTotalReviews());
-        hotelRepository.save(hotel);
-    }
-
-    private void validateHotelData(Hotel hotel) {
-        if (hotel.getName() == null || hotel.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Hotel name cannot be empty");
-        }
-        if (hotel.getAddress() == null || hotel.getAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("Hotel address cannot be empty");
-        }
-        if (hotel.getEmail() == null || hotel.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Hotel email cannot be empty");
-        }
-        if (hotel.getPhoneNumber() == null || hotel.getPhoneNumber().trim().isEmpty()) {
-            throw new IllegalArgumentException("Hotel phone number cannot be empty");
-        }
-        validateStarRating(hotel.getStarRating());
-    }
-
-    private void validateStarRating(Integer starRating) {
-        if (starRating == null || starRating < 1 || starRating > 5) {
-            throw new IllegalArgumentException("Star rating must be between 1 and 5");
-        }
-    }
-
-    private void validateRating(Double rating) {
-        if (rating == null || rating < 0 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 0 and 5");
-        }
+        List<Hotel> hotels = hotelRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            searchTerm, searchTerm, searchTerm);
+        log.debug("Found {} hotels matching search term: {}", hotels.size(), searchTerm);
+        return hotels.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 }

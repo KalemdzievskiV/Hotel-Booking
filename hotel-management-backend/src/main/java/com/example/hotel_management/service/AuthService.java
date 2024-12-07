@@ -1,5 +1,6 @@
 package com.example.hotel_management.service;
 
+import com.example.hotel_management.dto.LoginRequest;
 import com.example.hotel_management.entity.User;
 import com.example.hotel_management.enums.UserRole;
 import com.example.hotel_management.repository.UserRepository;
@@ -29,7 +30,7 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public Map<String, String> login(User loginRequest) {
+    public Map<String, String> login(LoginRequest loginRequest) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
