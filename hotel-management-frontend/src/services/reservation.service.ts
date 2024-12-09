@@ -1,5 +1,5 @@
 import { api } from './api.config';
-import { Reservation, CreateReservationDTO } from '../types/reservation.type';
+import { Reservation, CreateReservationDTO, ReservationStatus } from '../types/reservation.type';
 
 export class ReservationService {
     private static readonly BASE_PATH = '/reservations';
@@ -10,6 +10,11 @@ export class ReservationService {
     }
 
     static async updateReservation(id: number, reservation: Reservation): Promise<Reservation> {
+        const response = await api.put(`${this.BASE_PATH}/${id}`, reservation);
+        return response.data;
+    }
+
+    static async updateReservationDTO(id: number, reservation: CreateReservationDTO): Promise<Reservation> {
         const response = await api.put(`${this.BASE_PATH}/${id}`, reservation);
         return response.data;
     }
@@ -46,5 +51,44 @@ export class ReservationService {
 
     static async cancelReservation(id: number): Promise<void> {
         await api.post(`${this.BASE_PATH}/${id}/cancel`);
+    }
+
+    static async updateReservationStatus(id: number, status: ReservationStatus): Promise<Reservation> {
+        try {
+            console.log('Updating reservation status:', { id, status });
+            const response = await api.patch(`${this.BASE_PATH}/${id}/status`, { status });
+            const updatedReservation = response.data;
+            console.log('Updated reservation:', updatedReservation);
+
+            // Update the room status based on the new reservation status
+            if (updatedReservation.room && updatedReservation.room.id) {
+                console.log('Updating room status for room:', updatedReservation.room.id);
+                await this.updateRoomStatusForReservation(updatedReservation.room.id, status);
+            } else {
+                console.warn('No room ID found in reservation:', updatedReservation);
+            }
+
+            return updatedReservation;
+        } catch (error) {
+            console.error('Error in updateReservationStatus:', error);
+            throw error;
+        }
+    }
+
+    private static async updateRoomStatusForReservation(roomId: number, reservationStatus: ReservationStatus): Promise<void> {
+        try {
+            console.log('Making room status update request:', {
+                roomId,
+                reservationStatus
+            });
+            // Use the full API path with /api prefix
+            const response = await api.patch(`/api/rooms/${roomId}/status/by-reservation`, { 
+                reservationStatus 
+            });
+            console.log('Room status update response:', response.data);
+        } catch (error) {
+            console.error('Error updating room status:', error);
+            throw error;
+        }
     }
 }

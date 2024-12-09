@@ -110,3 +110,53 @@
   padding: 2px 4px;
   font-size: 0.75rem;
 }
+
+/* Added CSS styles to make the calendar horizontally scrollable and improve column widths */
+.fc .fc-resource-timeline,
+.fc .fc-scrollgrid {
+  overflow-x: auto !important;
+}
+
+.fc .fc-view-harness {
+  min-width: 900px;  /* Minimum width to ensure readability */
+}
+
+.fc-resource-timeline .fc-resource-group,
+.fc-resource-timeline .fc-datagrid-cell {
+  min-width: 200px !important;  /* Minimum width for each column */
+}
+
+.fc-direction-ltr .fc-resource-timeline-divider {
+  width: 3px !important;  /* Thinner divider between resource columns */
+}
+
+/* Make the calendar container responsive */
+.calendar-container {
+  width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+/* Adjust the width of resource columns for better readability */
+.fc-resourceTimeGridWeek-view .fc-resource-timeline .fc-resource-group,
+.fc-resourceTimeGridWeek-view .fc-resource-timeline .fc-datagrid-cell {
+  min-width: 150px !important;  /* Adjust width as needed */
+}
+
+/* Ensure the calendar is horizontally scrollable */
+.fc-resourceTimeGridWeek-view .fc-scrollgrid {
+  overflow-x: auto !important;
+}
+
+/* Adjust the height of time slots for better spacing */
+.fc-resourceTimeGridWeek-view .fc-timegrid-slot,
+.fc-resourceTimeGridDay-view .fc-timegrid-slot {
+  height: 1.5rem !important;  /* Reduced from 2rem to 1.5rem for smaller slots */
+}
+
+/* Make the calendar container responsive */
+.fc-resourceTimeGridWeek-view .calendar-container {
+  width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+}

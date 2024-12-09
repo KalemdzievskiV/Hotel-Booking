@@ -12,7 +12,13 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    List<Room> findByHotelId(Long hotelId);
+    @Query("SELECT DISTINCT r FROM Room r " +
+           "LEFT JOIN FETCH r.hotel h " +
+           "WHERE r.hotel.id = :hotelId")
+    List<Room> findByHotelId(@Param("hotelId") Long hotelId);
+    
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Room r WHERE r.number = :number AND r.hotel.id = :hotelId")
+    boolean existsByNumberAndHotelId(@Param("number") String number, @Param("hotelId") Long hotelId);
     
     List<Room> findByHotelIdAndStatus(Long hotelId, RoomStatus status);
     
@@ -29,8 +35,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             @Param("status") RoomStatus status,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice);
-    
-    boolean existsByNumberAndHotelId(String number, Long hotelId);
     
     @Query("SELECT COUNT(r) FROM Room r WHERE r.hotel.id = :hotelId AND r.status = :status")
     long countByHotelIdAndStatus(@Param("hotelId") Long hotelId, @Param("status") RoomStatus status);

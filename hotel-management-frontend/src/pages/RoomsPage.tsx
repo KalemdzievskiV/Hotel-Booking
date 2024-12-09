@@ -52,7 +52,29 @@ const RoomsPage: React.FC = () => {
 
       setUserHotelId(hotel.id);
       const roomsData = await RoomService.getRoomsByHotel(hotel.id);
-      setRooms(roomsData);
+      
+      console.log('Raw room data:', roomsData);
+      
+      // Validate room data before setting state
+      const validRooms = roomsData.filter(room => {
+        console.log('Checking room:', room);
+        return room && room.number && room.name;
+      });
+
+      console.log('Valid rooms:', validRooms);
+
+      if (validRooms.length !== roomsData.length) {
+        console.warn(`Filtered out ${roomsData.length - validRooms.length} invalid room entries`);
+        toast({
+          title: 'Warning',
+          description: 'Some rooms have invalid data and will not be displayed',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+
+      setRooms(validRooms);
     } catch (error) {
       console.error('Error fetching hotel and rooms:', error);
       toast({
@@ -79,6 +101,7 @@ const RoomsPage: React.FC = () => {
 
   const handleDeleteRoom = async (roomId: number) => {
     try {
+      await RoomService.deleteRoom(roomId);
       setRooms(rooms.filter(room => room.id !== roomId));
       toast({
         title: 'Success',
@@ -138,17 +161,23 @@ const RoomsPage: React.FC = () => {
                 <Skeleton key={i} height="400px" rounded="lg" />
               ))}
             </SimpleGrid>
-          ) : (
+          ) : rooms && rooms.length > 0 ? (
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {rooms.map((room) => (
+              {rooms.map((room) => room && (
                 <RoomComponent
-                  key={room.id}
+                  key={room.id || room.number}
                   room={room}
                   onEdit={handleEditRoom}
                   onDelete={handleDeleteRoom}
                 />
               ))}
             </SimpleGrid>
+          ) : (
+            <Box textAlign="center" py={10}>
+              <Text fontSize="lg" color="gray.500">
+                No rooms found
+              </Text>
+            </Box>
           )}
 
           {/* Add/Edit Room Dialog */}

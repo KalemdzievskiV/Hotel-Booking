@@ -92,9 +92,19 @@ public interface RoomService {
      * Updates room status
      * @param id Room ID
      * @param status New room status
+     * @return Updated room
      * @throws EntityNotFoundException if room not found
      */
-    void updateRoomStatus(Long id, RoomStatus status);
+    Room updateRoomStatus(Long id, RoomStatus status);
+
+    /**
+     * Updates room status by reservation status
+     * @param id Room ID
+     * @param reservationStatus New reservation status
+     * @return Updated room
+     * @throws EntityNotFoundException if room not found
+     */
+    Room updateRoomStatusByReservation(Long id, String reservationStatus);
 
     /**
      * Gets count of available rooms for a specific hotel

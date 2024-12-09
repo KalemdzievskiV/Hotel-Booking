@@ -57,10 +57,14 @@ export class RoomService {
         await api.delete(`${this.BASE_PATH}/${id}`);
     }
 
-    static async updateRoomStatus(id: number, status: RoomStatus): Promise<void> {
-        await api.patch(`${this.BASE_PATH}/${id}/status`, null, {
-            params: { status }
-        });
+    static async updateRoomStatus(roomId: number, status: RoomStatus): Promise<Room> {
+        const response = await api.patch(`${this.BASE_PATH}/${roomId}/status`, { status });
+        return response.data;
+    }
+
+    static async updateRoomStatusByReservation(roomId: number, reservationStatus: string): Promise<Room> {
+        const response = await api.patch(`${this.BASE_PATH}/${roomId}/status/by-reservation`, { reservationStatus });
+        return response.data;
     }
 
     static async getAvailableRoomCount(hotelId: number): Promise<number> {

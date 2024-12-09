@@ -15,11 +15,13 @@ export interface CreateReservationDTO {
     room: { id: number };
     hotel: { id: number };
     guest: { id: number };
+    createdBy: { id: number, role: string };
     checkInTime: string;
     checkOutTime: string;
     totalPrice: number;
     specialRequests?: string;
     status: ReservationStatus;
+    createdAt?: string;
 }
 
 export interface Reservation {
@@ -27,6 +29,7 @@ export interface Reservation {
     room: Room;
     hotel: Hotel;
     guest: User;
+    createdBy: User;
     checkInTime: string;
     checkOutTime: string;
     totalPrice: number;

@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
@@ -72,6 +71,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Room> getRoomsByHotelId(Long hotelId) {
         return roomRepository.findByHotelId(hotelId);
     }
@@ -107,10 +107,36 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public void updateRoomStatus(Long id, RoomStatus status) {
+    public Room updateRoomStatus(Long id, RoomStatus status) {
         Room room = getRoomById(id);
         room.setStatus(status);
-        roomRepository.save(room);
+        return roomRepository.save(room);
+    }
+
+    @Override
+    public Room updateRoomStatusByReservation(Long id, String reservationStatus) {
+        Room room = getRoomById(id);
+        RoomStatus newStatus;
+
+        switch (reservationStatus.toUpperCase()) {
+            case "CHECKED_IN":
+                newStatus = RoomStatus.OCCUPIED;
+                break;
+            case "CHECKED_OUT":
+                newStatus = RoomStatus.AVAILABLE;
+                break;
+            case "CONFIRMED":
+                // Room remains in its current status until check-in
+                return room;
+            case "CANCELLED":
+                newStatus = RoomStatus.AVAILABLE;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid reservation status: " + reservationStatus);
+        }
+
+        room.setStatus(newStatus);
+        return roomRepository.save(room);
     }
 
     @Override

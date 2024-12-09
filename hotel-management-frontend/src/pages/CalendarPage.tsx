@@ -22,6 +22,7 @@ import { Reservation } from '../types/reservation.type';
 import Sidebar from '../components/sidebar/Sidebar';
 import { AddReservationDialog } from '../components/reservations/AddReservationDialog';
 import './calendar.css';
+import { purple } from '@mui/material/colors';
 
 interface SelectionInfo {
   startStr: string;
@@ -40,6 +41,7 @@ const CalendarPage: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [currentHotel, setCurrentHotel] = useState<Hotel | null>(null);
   const [isReservationDialogOpen, setIsReservationDialogOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const textColor = useColorModeValue('gray.600', 'gray.300');
@@ -51,11 +53,15 @@ const CalendarPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'CONFIRMED':
-        return '#48BB78'; // green
+        return '#4CAF50'; // green
       case 'PENDING':
-        return '#ECC94B'; // yellow
+        return '#FFC107'; // yellow
       case 'CANCELLED':
-        return '#F56565'; // red
+        return '#F44336'; // red
+      case 'CHECKED_IN':
+        return '#2196F3'; // blue
+      case 'CHECKED_OUT':
+        return '#9E9E9E'; // dark gray
       default:
         return '#4299E1'; // blue
     }
@@ -111,6 +117,16 @@ const CalendarPage: React.FC = () => {
         endStr: selectInfo.endStr,
         resource: selectInfo.resource
       });
+      setIsReservationDialogOpen(true);
+    }
+  };
+
+  const handleEventClick = (clickInfo: any) => {
+    const reservationId = clickInfo.event.id;
+    const reservation = reservations.find(r => r.id?.toString() === reservationId);
+    if (reservation) {
+      setSelectedRoom(reservation.room);
+      setSelectedReservation(reservation);
       setIsReservationDialogOpen(true);
     }
   };
@@ -183,7 +199,7 @@ const CalendarPage: React.FC = () => {
                 slotMaxTime="24:00:00"
                 allDaySlot={false}
                 slotDuration="01:00:00"
-                height="700px"
+                height="calc(100vh - 220px)"
                 eventOverlap={false}
                 selectable={true}
                 selectMirror={true}
@@ -194,6 +210,7 @@ const CalendarPage: React.FC = () => {
                 editable={true}
                 droppable={true}
                 select={handleSelect}
+                eventClick={handleEventClick}
                 selectOverlap={false}
                 unselectAuto={false}
                 slotEventOverlap={false}
@@ -206,15 +223,21 @@ const CalendarPage: React.FC = () => {
           )}
 
           {/* Reservation Dialog */}
-          {selectedRoom && currentHotel && selection && (
+          {((selectedRoom && currentHotel && selection) || selectedReservation) && (
             <AddReservationDialog
               isOpen={isReservationDialogOpen}
-              onClose={() => setIsReservationDialogOpen(false)}
+              onClose={() => {
+                setIsReservationDialogOpen(false);
+                setSelectedReservation(null);
+                setSelectedRoom(null);
+                setSelection(null);
+              }}
               onReservationAdded={handleReservationAdded}
-              selectedRoom={selectedRoom}
-              selectedStartTime={selection.startStr}
-              selectedEndTime={selection.endStr}
-              hotel={currentHotel}
+              selectedRoom={selectedRoom || selectedReservation?.room!}
+              selectedStartTime={selection?.startStr || selectedReservation?.checkInTime || ''}
+              selectedEndTime={selection?.endStr || selectedReservation?.checkOutTime || ''}
+              hotel={currentHotel || selectedReservation?.hotel!}
+              existingReservation={selectedReservation || undefined}
             />
           )}
         </Container>

@@ -23,18 +23,23 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
-    @JsonIgnoreProperties({"reservations", "hotel"})
+    @JsonIgnoreProperties({"reservations", "hotel", "hibernateLazyInitializer"})
     private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
-    @JsonIgnoreProperties({"rooms", "reservations", "subscriptions"})
+    @JsonIgnoreProperties({"rooms", "reservations", "subscriptions", "hibernateLazyInitializer"})
     private Hotel hotel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guest_id", nullable = false)
-    @JsonIgnoreProperties("reservations")
+    @JsonIgnoreProperties({"reservations", "hibernateLazyInitializer"})
     private User guest;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id", nullable = false)
+    @JsonIgnoreProperties({"reservations", "hibernateLazyInitializer"})
+    private User createdBy;
 
     @Column(nullable = false)
     private LocalDateTime checkInTime;

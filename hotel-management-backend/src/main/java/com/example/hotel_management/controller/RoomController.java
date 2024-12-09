@@ -1,5 +1,6 @@
 package com.example.hotel_management.controller;
 
+import com.example.hotel_management.dto.RoomDTO;
 import com.example.hotel_management.entity.Room;
 import com.example.hotel_management.enums.RoomStatus;
 import com.example.hotel_management.service.RoomService;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -31,8 +34,8 @@ public class RoomController {
         MediaType.APPLICATION_JSON_VALUE,
         "application/json;charset=UTF-8"
     })
-    public ResponseEntity<Room> createRoom(@Valid @RequestBody Room room) {
-        return ResponseEntity.ok(roomService.createRoom(room));
+    public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody Room room) {
+        return ResponseEntity.ok(RoomDTO.fromEntity(roomService.createRoom(room)));
     }
 
     @PutMapping(
@@ -42,51 +45,63 @@ public class RoomController {
             "application/json;charset=UTF-8"
         }
     )
-    public ResponseEntity<Room> updateRoom(
+    public ResponseEntity<RoomDTO> updateRoom(
             @PathVariable Long id,
             @Valid @RequestBody Room room) {
-        return ResponseEntity.ok(roomService.updateRoom(id, room));
+        return ResponseEntity.ok(RoomDTO.fromEntity(roomService.updateRoom(id, room)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Room> getRoom(@PathVariable Long id) {
-        return ResponseEntity.ok(roomService.getRoomById(id));
+    public ResponseEntity<RoomDTO> getRoom(@PathVariable Long id) {
+        return ResponseEntity.ok(RoomDTO.fromEntity(roomService.getRoomById(id)));
     }
 
     @GetMapping
-    public ResponseEntity<List<Room>> getAllRooms() {
-        return ResponseEntity.ok(roomService.getAllRooms());
+    public ResponseEntity<List<RoomDTO>> getAllRooms() {
+        return ResponseEntity.ok(roomService.getAllRooms().stream()
+                .map(RoomDTO::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/hotel/{hotelId}")
-    public ResponseEntity<List<Room>> getRoomsByHotel(@PathVariable Long hotelId) {
-        return ResponseEntity.ok(roomService.getRoomsByHotelId(hotelId));
+    public ResponseEntity<List<RoomDTO>> getRoomsByHotel(@PathVariable Long hotelId) {
+        return ResponseEntity.ok(roomService.getRoomsByHotelId(hotelId).stream()
+                .map(RoomDTO::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/hotel/{hotelId}/available")
-    public ResponseEntity<List<Room>> getAvailableRoomsByHotel(@PathVariable Long hotelId) {
-        return ResponseEntity.ok(roomService.getAvailableRoomsByHotel(hotelId));
+    public ResponseEntity<List<RoomDTO>> getAvailableRoomsByHotel(@PathVariable Long hotelId) {
+        return ResponseEntity.ok(roomService.getAvailableRoomsByHotel(hotelId).stream()
+                .map(RoomDTO::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/hotel/{hotelId}/price-range")
-    public ResponseEntity<List<Room>> getRoomsByPriceRange(
+    public ResponseEntity<List<RoomDTO>> getRoomsByPriceRange(
             @PathVariable Long hotelId,
             @RequestParam BigDecimal minPrice,
             @RequestParam BigDecimal maxPrice) {
-        return ResponseEntity.ok(roomService.getRoomsByPriceRange(hotelId, minPrice, maxPrice));
+        return ResponseEntity.ok(roomService.getRoomsByPriceRange(hotelId, minPrice, maxPrice).stream()
+                .map(RoomDTO::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/hotel/{hotelId}/available/price-range")
-    public ResponseEntity<List<Room>> getAvailableRoomsByPriceRange(
+    public ResponseEntity<List<RoomDTO>> getAvailableRoomsByPriceRange(
             @PathVariable Long hotelId,
             @RequestParam BigDecimal minPrice,
             @RequestParam BigDecimal maxPrice) {
-        return ResponseEntity.ok(roomService.getAvailableRoomsByPriceRange(hotelId, minPrice, maxPrice));
+        return ResponseEntity.ok(roomService.getAvailableRoomsByPriceRange(hotelId, minPrice, maxPrice).stream()
+                .map(RoomDTO::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/hotel/{hotelId}/available/sorted")
-    public ResponseEntity<List<Room>> getAvailableRoomsSortedByPrice(@PathVariable Long hotelId) {
-        return ResponseEntity.ok(roomService.getAvailableRoomsSortedByPrice(hotelId));
+    public ResponseEntity<List<RoomDTO>> getAvailableRoomsSortedByPrice(@PathVariable Long hotelId) {
+        return ResponseEntity.ok(roomService.getAvailableRoomsSortedByPrice(hotelId).stream()
+                .map(RoomDTO::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @DeleteMapping("/{id}")
@@ -96,11 +111,21 @@ public class RoomController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateRoomStatus(
+    public ResponseEntity<Room> updateRoomStatus(
             @PathVariable Long id,
-            @RequestParam RoomStatus status) {
-        roomService.updateRoomStatus(id, status);
-        return ResponseEntity.ok().build();
+            @RequestBody Map<String, String> statusMap) {
+        RoomStatus status = RoomStatus.valueOf(statusMap.get("status"));
+        Room updatedRoom = roomService.updateRoomStatus(id, status);
+        return ResponseEntity.ok(updatedRoom);
+    }
+
+    @PatchMapping("/{id}/status/by-reservation")
+    public ResponseEntity<Room> updateRoomStatusByReservation(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> statusMap) {
+        String reservationStatus = statusMap.get("reservationStatus");
+        Room updatedRoom = roomService.updateRoomStatusByReservation(id, reservationStatus);
+        return ResponseEntity.ok(updatedRoom);
     }
 
     @GetMapping("/hotel/{hotelId}/available/count")

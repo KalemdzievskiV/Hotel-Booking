@@ -19,7 +19,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // Find by room ID
     List<Reservation> findByRoomId(Long roomId);
     
-    // Find by hotel ID
+    // Find by hotel ID with all necessary relationships
+    @Query("SELECT DISTINCT r FROM Reservation r " +
+           "LEFT JOIN FETCH r.room rm " +
+           "LEFT JOIN FETCH rm.pictures " +
+           "LEFT JOIN FETCH r.guest g " +
+           "LEFT JOIN FETCH r.createdBy cb " +
+           "LEFT JOIN FETCH r.hotel h " +
+           "WHERE r.hotel.id = :hotelId")
+    List<Reservation> findByHotelIdWithDetails(@Param("hotelId") Long hotelId);
+
+    // Simple find by hotel ID (when full details aren't needed)
     List<Reservation> findByHotelId(Long hotelId);
     
     // Find upcoming reservations for a guest
@@ -63,4 +73,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     
     // Find all reservations by status
     List<Reservation> findByStatus(ReservationStatus status);
+    
+    // Find reservations that should be checked in
+    List<Reservation> findByStatusAndCheckInTimeBefore(ReservationStatus status, LocalDateTime checkTime);
+    
+    // Find reservations that should be checked out
+    List<Reservation> findByStatusAndCheckOutTimeBefore(ReservationStatus status, LocalDateTime checkTime);
+    
+    // Find current reservations for a guest
+    @Query("SELECT r FROM Reservation r " +
+           "WHERE r.guest.id = :guestId " +
+           "AND r.checkInTime <= :currentTime " +
+           "AND r.checkOutTime > :currentTime " +
+           "AND r.status = 'CONFIRMED'")
+    List<Reservation> findCurrentReservations(@Param("guestId") Long guestId, @Param("currentTime") LocalDateTime currentTime);
 }

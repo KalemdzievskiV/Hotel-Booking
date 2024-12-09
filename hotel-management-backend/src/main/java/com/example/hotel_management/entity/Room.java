@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
+
+import java.util.HashSet;
 
 @Data
 @NoArgsConstructor
@@ -38,17 +40,29 @@ public class Room {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @ElementCollection
-    @CollectionTable(name = "room_pictures", joinColumns = @JoinColumn(name = "room_id"))
-    @Column(name = "picture_url")
-    private List<String> pictures;
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonIgnoreProperties("room")
+    private Set<Picture> pictures = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
-    @JsonIgnoreProperties({"rooms", "reservations", "subscriptions"})
+    @JsonIgnoreProperties({"rooms", "reservations", "subscriptions", "hibernateLazyInitializer"})
     private Hotel hotel;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("room")
-    private List<Reservation> reservations;
+    private Set<Reservation> reservations = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Room)) return false;
+        Room room = (Room) o;
+        return id != null && id.equals(room.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

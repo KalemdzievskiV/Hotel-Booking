@@ -1,6 +1,10 @@
 package com.example.hotel_management.service;
 
+import com.example.hotel_management.dto.ReservationDTO;
 import com.example.hotel_management.entity.Reservation;
+import com.example.hotel_management.enums.ReservationStatus;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +23,7 @@ public interface ReservationService {
      * @throws IllegalArgumentException if reservation dates are invalid
      * @throws IllegalStateException if the room is not available
      */
-    Reservation createReservation(Reservation reservation);
+    ReservationDTO createReservation(Reservation reservation);
 
     /**
      * Updates an existing reservation.
@@ -32,7 +36,7 @@ public interface ReservationService {
      * @throws IllegalArgumentException if updated dates are invalid
      * @throws IllegalStateException if the room is not available for new dates
      */
-    Reservation updateReservation(Long id, Reservation reservation);
+    ReservationDTO updateReservation(Long id, Reservation reservation);
 
     /**
      * Retrieves a reservation by its ID.
@@ -41,14 +45,14 @@ public interface ReservationService {
      * @return The reservation
      * @throws EntityNotFoundException if reservation not found
      */
-    Reservation getReservationById(Long id);
+    ReservationDTO getReservationById(Long id);
 
     /**
      * Retrieves all reservations in the system.
      *
      * @return List of all reservations
      */
-    List<Reservation> getAllReservations();
+    List<ReservationDTO> getAllReservations();
 
     /**
      * Retrieves all reservations for a specific guest.
@@ -56,7 +60,7 @@ public interface ReservationService {
      * @param guestId The ID of the guest
      * @return List of reservations for the guest
      */
-    List<Reservation> getReservationsByUserId(Long guestId);
+    List<ReservationDTO> getReservationsByUserId(Long guestId);
 
     /**
      * Retrieves all reservations for a specific hotel.
@@ -64,7 +68,7 @@ public interface ReservationService {
      * @param hotelId The ID of the hotel
      * @return List of reservations for the hotel
      */
-    List<Reservation> getReservationsByHotelId(Long hotelId);
+    List<ReservationDTO> getReservationsByHotelId(Long hotelId);
 
     /**
      * Retrieves upcoming reservations for a guest.
@@ -73,7 +77,7 @@ public interface ReservationService {
      * @param guestId The ID of the guest
      * @return List of upcoming reservations
      */
-    List<Reservation> getUpcomingReservations(Long guestId);
+    List<ReservationDTO> getUpcomingReservations(Long guestId);
 
     /**
      * Retrieves current active reservations for a guest.
@@ -82,7 +86,22 @@ public interface ReservationService {
      * @param guestId The ID of the guest
      * @return List of current reservations
      */
-    List<Reservation> getCurrentReservations(Long guestId);
+    List<ReservationDTO> getCurrentReservations(Long guestId);
+
+    /**
+     * Updates the status of a reservation based on its check-in and check-out times.
+     * Changes status to CHECKED_IN if check-in time has passed and status is CONFIRMED.
+     * Changes status to CHECKED_OUT if check-out time has passed and status is CHECKED_IN.
+     *
+     * @param id The ID of the reservation to update
+     */
+    void updateReservationStatusBasedOnTime(Long id);
+
+    /**
+     * Updates the status of all reservations based on their check-in and check-out times.
+     * This method is scheduled to run periodically.
+     */
+    void updateReservationStatuses();
 
     /**
      * Cancels a reservation.
@@ -95,4 +114,7 @@ public interface ReservationService {
     void cancelReservation(Long id);
 
     boolean isRoomAvailable(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut);
+
+    @Transactional
+    ReservationDTO updateReservationStatus(Long id, ReservationStatus status);
 }
