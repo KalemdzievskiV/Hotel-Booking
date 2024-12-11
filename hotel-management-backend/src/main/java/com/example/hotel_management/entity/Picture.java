@@ -15,7 +15,7 @@ public class Picture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

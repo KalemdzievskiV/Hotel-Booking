@@ -33,4 +33,17 @@ public class UserDTO {
         dto.setActive(user.isActive());
         return dto;
     }
+
+    public com.example.hotel_management.entity.User toEntity() {
+        com.example.hotel_management.entity.User user = new com.example.hotel_management.entity.User();
+        user.setId(this.id);
+        user.setFirstName(this.firstName);
+        user.setLastName(this.lastName);
+        user.setUsername(this.username);
+        user.setRole(this.role);
+        user.setEmail(this.email);
+        user.setPhoneNumber(this.phoneNumber);
+        user.setActive(this.active);
+        return user;
+    }
 }

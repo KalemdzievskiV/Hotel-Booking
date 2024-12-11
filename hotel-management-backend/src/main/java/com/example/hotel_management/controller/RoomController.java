@@ -4,17 +4,22 @@ import com.example.hotel_management.dto.RoomDTO;
 import com.example.hotel_management.entity.Room;
 import com.example.hotel_management.enums.RoomStatus;
 import com.example.hotel_management.service.RoomService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/rooms")
 @CrossOrigin(origins = "*")
@@ -40,15 +45,35 @@ public class RoomController {
 
     @PutMapping(
         value = "/{id}",
-        consumes = {
-            MediaType.APPLICATION_JSON_VALUE,
-            "application/json;charset=UTF-8"
-        }
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<RoomDTO> updateRoom(
-            @PathVariable Long id,
-            @Valid @RequestBody Room room) {
-        return ResponseEntity.ok(RoomDTO.fromEntity(roomService.updateRoom(id, room)));
+    public ResponseEntity<?> updateRoom(@PathVariable Long id, @Valid @RequestBody RoomDTO roomDTO) {
+        try {
+            Room room = roomDTO.toEntity(); 
+            Room updatedRoom = roomService.updateRoom(id, room);
+            return ResponseEntity.ok(RoomDTO.fromEntity(updatedRoom));
+        } catch (EntityNotFoundException e) {
+            log.warn("Room not found with id {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error updating room: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error updating room"));
+        }
+    }
+
+    @PostMapping("/{id}/picture")
+    public ResponseEntity<?> uploadPicture(@PathVariable Long id, @RequestParam("picture") MultipartFile picture) {
+        try {
+            roomService.uploadPicture(id, picture);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            log.warn("Room not found with id {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            log.error("Error uploading picture: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error uploading picture"));
+        }
     }
 
     @GetMapping("/{id}")

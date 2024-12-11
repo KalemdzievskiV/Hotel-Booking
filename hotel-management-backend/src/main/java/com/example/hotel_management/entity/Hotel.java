@@ -45,7 +45,7 @@ public class Hotel {
 
     @ElementCollection
     @CollectionTable(name = "hotel_pictures", joinColumns = @JoinColumn(name = "hotel_id"))
-    @Column(name = "picture_url")
+    @Column(name = "picture_url", columnDefinition = "TEXT")
     private List<String> pictures;
 
     @Column(nullable = false)

@@ -20,111 +20,123 @@ import { HotelService } from '../../services/hotel.service';
 import { Hotel } from '../../types/hotel.type';
 import Sidebar from '../sidebar/Sidebar';
 import AddHotelDialog from './AddHotelDialog';
+import HotelDetailsDialog from './HotelDetailsDialog';
 
 const HotelCard: React.FC<{ hotel: Hotel }> = ({ hotel }) => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.600', 'gray.300');
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box
-      bg={cardBg}
-      rounded="lg"
-      shadow="md"
-      overflow="hidden"
-      transition="transform 0.2s"
-      _hover={{ transform: 'translateY(-5px)' }}
-    >
-      {/* Hotel Image */}
-      <Box position="relative" h="200px">
-        <Image
-          src={hotel.pictures[0] || 'https://via.placeholder.com/400x200?text=Hotel+Image'}
-          alt={hotel.name}
-          objectFit="cover"
-          w="100%"
-          h="100%"
-        />
-        <Badge
-          position="absolute"
-          top="4"
-          right="4"
-          px="2"
-          py="1"
-          colorScheme={hotel.averageRating >= 4 ? 'green' : 'orange'}
-          rounded="md"
-        >
-          {hotel.averageRating.toFixed(1)} / 5
-        </Badge>
-      </Box>
+    <>
+      <Box
+        bg={cardBg}
+        rounded="lg"
+        shadow="md"
+        overflow="hidden"
+        transition="transform 0.2s"
+        _hover={{ transform: 'translateY(-5px)' }}
+        onClick={onOpen}
+        cursor="pointer"
+      >
+        {/* Hotel Image */}
+        <Box position="relative" h="200px">
+          <Image
+            src={hotel.pictures[0] || 'https://via.placeholder.com/400x200?text=Hotel+Image'}
+            alt={hotel.name}
+            objectFit="cover"
+            w="100%"
+            h="100%"
+          />
+          <Badge
+            position="absolute"
+            top="4"
+            right="4"
+            px="2"
+            py="1"
+            colorScheme={hotel.averageRating >= 4 ? 'green' : 'orange'}
+            rounded="md"
+          >
+            {hotel.averageRating.toFixed(1)} / 5
+          </Badge>
+        </Box>
 
-      {/* Hotel Info */}
-      <Stack p="6" spacing="3">
-        <Heading size="md" fontWeight="bold">
-          {hotel.name}
-        </Heading>
+        {/* Hotel Info */}
+        <Stack p="6" spacing="3">
+          <Heading size="md" fontWeight="bold">
+            {hotel.name}
+          </Heading>
 
-        {/* Star Rating */}
-        <Flex align="center">
-          {[...Array(5)].map((_, index) => (
-            <Icon
-              key={index}
-              as={FiStar}
-              color={index < hotel.starRating ? 'yellow.400' : 'gray.300'}
-              w={4}
-              h={4}
-            />
-          ))}
-        </Flex>
-
-        {/* Contact Info */}
-        <Stack spacing="2">
+          {/* Star Rating */}
           <Flex align="center">
-            <Icon as={FiMapPin} color={textColor} mr="2" />
-            <Text color={textColor} fontSize="sm">
-              {hotel.address}
-            </Text>
+            {[...Array(5)].map((_, index) => (
+              <Icon
+                key={index}
+                as={FiStar}
+                color={index < hotel.starRating ? 'yellow.400' : 'gray.300'}
+                w={4}
+                h={4}
+              />
+            ))}
           </Flex>
-          <Flex align="center">
-            <Icon as={FiPhone} color={textColor} mr="2" />
-            <Text color={textColor} fontSize="sm">
-              {hotel.phoneNumber}
-            </Text>
-          </Flex>
-          <Flex align="center">
-            <Icon as={FiMail} color={textColor} mr="2" />
-            <Text color={textColor} fontSize="sm">
-              {hotel.email}
-            </Text>
+
+          {/* Contact Info */}
+          <Stack spacing="2">
+            <Flex align="center">
+              <Icon as={FiMapPin} color={textColor} mr="2" />
+              <Text color={textColor} fontSize="sm">
+                {hotel.address}
+              </Text>
+            </Flex>
+            <Flex align="center">
+              <Icon as={FiPhone} color={textColor} mr="2" />
+              <Text color={textColor} fontSize="sm">
+                {hotel.phoneNumber}
+              </Text>
+            </Flex>
+            <Flex align="center">
+              <Icon as={FiMail} color={textColor} mr="2" />
+              <Text color={textColor} fontSize="sm">
+                {hotel.email}
+              </Text>
+            </Flex>
+          </Stack>
+
+          {/* Amenities */}
+          <Flex flexWrap="wrap" gap="2">
+            {hotel.amenities.slice(0, 3).map((amenity, index) => (
+              <Badge
+                key={index}
+                colorScheme="blue"
+                variant="subtle"
+                px="2"
+                py="1"
+                rounded="md"
+              >
+                {amenity}
+              </Badge>
+            ))}
+            {hotel.amenities.length > 3 && (
+              <Badge
+                colorScheme="gray"
+                variant="subtle"
+                px="2"
+                py="1"
+                rounded="md"
+              >
+                +{hotel.amenities.length - 3} more
+              </Badge>
+            )}
           </Flex>
         </Stack>
+      </Box>
 
-        {/* Amenities */}
-        <Flex flexWrap="wrap" gap="2">
-          {hotel.amenities.slice(0, 3).map((amenity, index) => (
-            <Badge
-              key={index}
-              colorScheme="blue"
-              variant="subtle"
-              px="2"
-              py="1"
-              rounded="md"
-            >
-              {amenity}
-            </Badge>
-          ))}
-          {hotel.amenities.length > 3 && (
-            <Badge
-              colorScheme="gray"
-              variant="subtle"
-              px="2"
-              py="1"
-              rounded="md"
-            >
-              +{hotel.amenities.length - 3} more
-            </Badge>
-          )}
-        </Flex>
-      </Stack>
-    </Box>
+      <HotelDetailsDialog
+        hotel={hotel}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
+    </>
   );
 };
 

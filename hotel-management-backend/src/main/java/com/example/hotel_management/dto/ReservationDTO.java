@@ -49,4 +49,28 @@ public class ReservationDTO {
         dto.setUpdatedAt(reservation.getUpdatedAt());
         return dto;
     }
+
+    public Reservation toEntity() {
+        Reservation reservation = new Reservation();
+        reservation.setId(this.id);
+        reservation.setCheckInTime(this.checkInTime);
+        reservation.setCheckOutTime(this.checkOutTime);
+        reservation.setStatus(this.status);
+        
+        if (this.room != null) {
+            reservation.setRoom(this.room.toEntity());
+        }
+        
+        if (this.guest != null) {
+            reservation.setGuest(this.guest.toEntity());
+        }
+        
+        if (this.createdBy != null) {
+            reservation.setCreatedBy(this.createdBy.toEntity());
+        }
+        
+        reservation.setCreatedAt(this.createdAt);
+        reservation.setUpdatedAt(this.updatedAt);
+        return reservation;
+    }
 }

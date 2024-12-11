@@ -4,6 +4,8 @@ import com.example.hotel_management.entity.Room;
 import com.example.hotel_management.enums.RoomStatus;
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 public interface RoomService {
     /**
@@ -112,4 +114,13 @@ public interface RoomService {
      * @return Count of available rooms
      */
     long getAvailableRoomCount(Long hotelId);
+
+    /**
+     * Uploads a picture for a room
+     * @param id Room ID
+     * @param picture Picture to upload
+     * @return Updated room
+     * @throws IOException if an I/O error occurs
+     */
+    Room uploadPicture(Long id, MultipartFile picture) throws IOException;
 }

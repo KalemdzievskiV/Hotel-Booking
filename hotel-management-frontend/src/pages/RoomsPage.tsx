@@ -18,14 +18,17 @@ import { HotelService } from '../services/hotel.service';
 import { Room } from '../types/room.type';
 import { RoomComponent } from '../components/rooms/RoomComponent';
 import { AddRoomDialog } from '../components/rooms/AddRoomDialog';
+import RoomDetailsDialog from '../components/rooms/RoomDetailsDialog';
 import Sidebar from '../components/sidebar/Sidebar';
 
 const RoomsPage: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<Room | undefined>();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isAddDialogOpen, onOpen: onAddDialogOpen, onClose: onAddDialogClose } = useDisclosure();
+  const { isOpen: isDetailsDialogOpen, onOpen: onDetailsDialogOpen, onClose: onDetailsDialogClose } = useDisclosure();
   const bgColor = useColorModeValue('gray.50', 'gray.900');
+  const cardBgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.600', 'gray.300');
   const toast = useToast();
   const [userHotelId, setUserHotelId] = useState<number | null>(null);
@@ -91,18 +94,33 @@ const RoomsPage: React.FC = () => {
 
   const handleAddRoom = () => {
     setSelectedRoom(undefined);
-    onOpen();
+    onAddDialogOpen();
   };
 
   const handleEditRoom = (room: Room) => {
     setSelectedRoom(room);
-    onOpen();
+    onAddDialogOpen();
   };
 
-  const handleDeleteRoom = async (roomId: number) => {
+  const handleRoomClick = (room: Room) => {
+    setSelectedRoom(room);
+    onDetailsDialogOpen();
+  };
+
+  const handleDeleteRoom = async (room: Room) => {
+    if (!room.id) {
+      toast({
+        title: 'Error',
+        description: 'Room ID is missing',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
-      await RoomService.deleteRoom(roomId);
-      setRooms(rooms.filter(room => room.id !== roomId));
+      await RoomService.deleteRoom(room.id);
       toast({
         title: 'Success',
         description: 'Room deleted successfully',
@@ -110,6 +128,7 @@ const RoomsPage: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      fetchUserHotelAndRooms();
     } catch (error) {
       console.error('Error deleting room:', error);
       toast({
@@ -119,13 +138,11 @@ const RoomsPage: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
-      // Refresh the rooms list to ensure UI is in sync with backend
-      fetchUserHotelAndRooms();
     }
   };
 
   const handleRoomSaved = () => {
-    onClose();
+    onAddDialogClose();
     fetchUserHotelAndRooms();
   };
 
@@ -133,17 +150,9 @@ const RoomsPage: React.FC = () => {
     <Box minH="100vh" bg={bgColor}>
       <Sidebar />
       <Box ml={{ base: 0, md: 60 }} p="4">
-        <Container maxW="container.xl" py={5}>
-          {/* Header */}
-          <Flex justify="space-between" align="center" mb={6}>
-            <Box>
-              <Heading size="lg" mb={2}>
-                Rooms
-              </Heading>
-              <Text color={textColor}>
-                Manage your hotel rooms
-              </Text>
-            </Box>
+        <Container maxW="7xl" py="8">
+          <Flex justify="space-between" align="center" mb="8">
+            <Heading>Hotel Rooms</Heading>
             <Button
               leftIcon={<FiPlus />}
               colorScheme="blue"
@@ -154,41 +163,58 @@ const RoomsPage: React.FC = () => {
             </Button>
           </Flex>
 
-          {/* Rooms Grid */}
           {loading ? (
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {[1, 2, 3].map((i) => (
-                <Skeleton key={i} height="400px" rounded="lg" />
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+              {[1, 2, 3].map((n) => (
+                <Skeleton key={n} height="400px" rounded="lg" />
               ))}
             </SimpleGrid>
-          ) : rooms && rooms.length > 0 ? (
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {rooms.map((room) => room && (
-                <RoomComponent
-                  key={room.id || room.number}
-                  room={room}
-                  onEdit={handleEditRoom}
-                  onDelete={handleDeleteRoom}
-                />
+          ) : rooms.length > 0 ? (
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+              {rooms.map((room) => (
+                <Box
+                  key={room.id}
+                  onClick={() => handleRoomClick(room)}
+                  cursor="pointer"
+                  bg={cardBgColor}
+                  rounded="lg"
+                  shadow="md"
+                  overflow="hidden"
+                  transition="transform 0.2s"
+                  _hover={{ transform: 'translateY(-5px)' }}
+                >
+                  <RoomComponent
+                    room={room}
+                    onEdit={() => handleEditRoom(room)}
+                    onDelete={() => handleDeleteRoom(room)}
+                  />
+                </Box>
               ))}
             </SimpleGrid>
           ) : (
             <Box textAlign="center" py={10}>
               <Text fontSize="lg" color="gray.500">
-                No rooms found
+                No rooms found. Click the "Add Room" button to create one.
               </Text>
             </Box>
           )}
-
-          {/* Add/Edit Room Dialog */}
-          <AddRoomDialog
-            isOpen={isOpen}
-            onClose={onClose}
-            onRoomAdded={handleRoomSaved}
-            hotelId={userHotelId || undefined}
-            editRoom={selectedRoom}
-          />
         </Container>
+
+        <AddRoomDialog
+          isOpen={isAddDialogOpen}
+          onClose={onAddDialogClose}
+          editRoom={selectedRoom}
+          hotelId={userHotelId || undefined}
+          onRoomAdded={handleRoomSaved}
+        />
+
+        {selectedRoom && (
+          <RoomDetailsDialog
+            isOpen={isDetailsDialogOpen}
+            onClose={onDetailsDialogClose}
+            room={selectedRoom}
+          />
+        )}
       </Box>
     </Box>
   );

@@ -62,4 +62,34 @@ export class HotelService {
             return null;
         }
     }
+
+    static async uploadPictures(id: number, formData: FormData): Promise<Hotel> {
+        console.log('Uploading pictures for hotel with id:', id);
+        // First get the current hotel data
+        const currentHotel = await this.getHotel(id);
+        
+        // Extract pictures from FormData
+        const pictures: string[] = [];
+        const pictureFiles = formData.getAll('pictures');
+        for (const file of pictureFiles) {
+            // Convert each file to base64
+            const base64 = await new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(file as Blob);
+            });
+            pictures.push(base64);
+        }
+
+        // Merge new pictures with existing ones
+        const updatedHotel = {
+            ...currentHotel,
+            pictures: [...(currentHotel.pictures || []), ...pictures]
+        };
+
+        // Use the update endpoint
+        const response = await api.put(`${this.BASE_PATH}/${id}`, updatedHotel);
+        console.log('Upload pictures response:', response.data);
+        return response.data;
+    }
 }

@@ -53,6 +53,23 @@ public class Room {
     @JsonIgnoreProperties("room")
     private Set<Reservation> reservations = new HashSet<>();
 
+    public void addPicture(Picture picture) {
+        pictures.add(picture);
+        picture.setRoom(this);
+    }
+
+    public void removePicture(Picture picture) {
+        pictures.remove(picture);
+        picture.setRoom(null);
+    }
+
+    public void setPictures(Set<Picture> pictures) {
+        this.pictures.clear();
+        if (pictures != null) {
+            pictures.forEach(this::addPicture);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

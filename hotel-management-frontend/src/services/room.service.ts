@@ -71,4 +71,35 @@ export class RoomService {
         const response = await api.get(`${this.BASE_PATH}/hotel/${hotelId}/available/count`);
         return response.data;
     }
+
+    static async uploadPictures(id: number, formData: FormData): Promise<Room> {
+        console.log('Uploading pictures for room with id:', id);
+        // First get the current room data
+        const currentRoom = await this.getRoom(id);
+        
+        // Extract pictures from FormData
+        const pictures: { url: string }[] = [];
+        const pictureFiles = formData.getAll('pictures');
+        for (const file of pictureFiles) {
+            // Convert each file to base64
+            const base64 = await new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(file as Blob);
+            });
+            pictures.push({ url: base64 });
+        }
+
+        // Merge new pictures with existing ones and preserve all other room data
+        const updatedRoom = {
+            ...currentRoom,
+            pictures: [...(currentRoom.pictures || []).map(p => ({ url: p.url })), ...pictures],
+            hotel: currentRoom.hotel // Ensure hotel association is preserved
+        };
+
+        // Use the update endpoint
+        const response = await api.put(`${this.BASE_PATH}/${id}`, updatedRoom);
+        console.log('Upload pictures response:', response.data);
+        return response.data;
+    }
 }

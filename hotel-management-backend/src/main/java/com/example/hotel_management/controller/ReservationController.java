@@ -27,15 +27,15 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody Reservation reservation) {
-        return ResponseEntity.ok(reservationService.createReservation(reservation));
+    public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO) {
+        return ResponseEntity.ok(reservationService.createReservation(reservationDTO.toEntity()));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ReservationDTO> updateReservation(
             @PathVariable Long id,
-            @Valid @RequestBody Reservation reservation) {
-        return ResponseEntity.ok(reservationService.updateReservation(id, reservation));
+            @Valid @RequestBody ReservationDTO reservationDTO) {
+        return ResponseEntity.ok(reservationService.updateReservation(id, reservationDTO.toEntity()));
     }
 
     @GetMapping("/{id}")

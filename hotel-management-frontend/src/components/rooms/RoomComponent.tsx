@@ -122,21 +122,22 @@ export const RoomComponent: React.FC<RoomComponentProps> = ({ room, onEdit, onDe
       <Box h="200px" bg="gray.100">
         {room.pictures && room.pictures.length > 0 ? (
           <Image
-            src={room.pictures[0]}
+            src={room.pictures[0].url}
             alt={room.name}
             objectFit="cover"
             w="100%"
-            h="100%"
+            h="200px"
           />
         ) : (
-          <Flex
-            h="100%"
-            align="center"
-            justify="center"
+          <Box
+            h="200px"
             bg="gray.100"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
           >
             <Text color="gray.500">No image available</Text>
-          </Flex>
+          </Box>
         )}
       </Box>
 

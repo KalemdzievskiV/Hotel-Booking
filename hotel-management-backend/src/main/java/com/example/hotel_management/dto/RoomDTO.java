@@ -8,6 +8,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -18,8 +19,13 @@ public class RoomDTO {
     private String description;
     private RoomStatus status;
     private BigDecimal price;
-    private List<String> pictures = new ArrayList<>();
+    private List<PictureDTO> pictures = new ArrayList<>();
     private Long hotelId;
+
+    @Data
+    public static class PictureDTO {
+        private String url;
+    }
 
     public static RoomDTO fromEntity(Room room) {
         if (room == null) {
@@ -37,7 +43,11 @@ public class RoomDTO {
         if (room.getPictures() != null) {
             roomDTO.setPictures(room.getPictures().stream()
                     .filter(p -> p != null && p.getUrl() != null)
-                    .map(Picture::getUrl)
+                    .map(picture -> {
+                        PictureDTO pictureDTO = new PictureDTO();
+                        pictureDTO.setUrl(picture.getUrl());
+                        return pictureDTO;
+                    })
                     .collect(Collectors.toList()));
         }
         
@@ -46,5 +56,29 @@ public class RoomDTO {
         }
         
         return roomDTO;
+    }
+
+    public Room toEntity() {
+        Room room = new Room();
+        room.setId(this.id);
+        room.setNumber(this.number);
+        room.setName(this.name);
+        room.setDescription(this.description);
+        room.setStatus(this.status);
+        room.setPrice(this.price);
+        
+        if (this.pictures != null) {
+            Set<Picture> pictureEntities = this.pictures.stream()
+                .map(pictureDTO -> {
+                    Picture picture = new Picture();
+                    picture.setUrl(pictureDTO.getUrl());
+                    picture.setRoom(room);
+                    return picture;
+                })
+                .collect(Collectors.toSet());
+            room.setPictures(pictureEntities);
+        }
+        
+        return room;
     }
 }

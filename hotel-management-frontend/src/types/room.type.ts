@@ -14,6 +14,11 @@ export enum RoomType {
     EXECUTIVE = 'EXECUTIVE'
 }
 
+export interface Picture {
+    id?: number;
+    url: string;
+}
+
 export interface Room {
     id?: number;
     number: string;
@@ -22,7 +27,7 @@ export interface Room {
     status: RoomStatus;
     type: RoomType;
     price: number;
-    pictures: string[];
     hotel: Hotel;
+    pictures: Picture[];
     reservations?: Reservation[];
 }

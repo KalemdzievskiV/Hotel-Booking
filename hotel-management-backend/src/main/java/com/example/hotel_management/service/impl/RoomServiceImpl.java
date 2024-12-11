@@ -1,6 +1,7 @@
 package com.example.hotel_management.service.impl;
 
 import com.example.hotel_management.entity.Room;
+import com.example.hotel_management.entity.Picture;
 import com.example.hotel_management.enums.RoomStatus;
 import com.example.hotel_management.repository.RoomRepository;
 import com.example.hotel_management.service.RoomService;
@@ -8,8 +9,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -39,6 +44,9 @@ public class RoomServiceImpl implements RoomService {
     public Room updateRoom(Long id, Room room) {
         Room existingRoom = getRoomById(id);
         
+        // Preserve hotel association
+        room.setHotel(existingRoom.getHotel());
+        
         validateRoomData(room);
         
         // Check if room number is being changed and if it already exists
@@ -54,7 +62,11 @@ public class RoomServiceImpl implements RoomService {
         existingRoom.setDescription(room.getDescription());
         existingRoom.setStatus(room.getStatus());
         existingRoom.setPrice(room.getPrice());
-        existingRoom.setPictures(room.getPictures());
+        
+        // Handle pictures using the helper method
+        if (room.getPictures() != null) {
+            existingRoom.setPictures(new HashSet<>(room.getPictures()));
+        }
         
         return roomRepository.save(existingRoom);
     }
@@ -142,6 +154,23 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public long getAvailableRoomCount(Long hotelId) {
         return roomRepository.countByHotelIdAndStatus(hotelId, RoomStatus.AVAILABLE);
+    }
+
+    @Override
+    public Room uploadPicture(Long id, MultipartFile picture) throws IOException {
+        Room room = getRoomById(id);
+        
+        // Convert MultipartFile to base64 string
+        String base64Picture = Base64.getEncoder().encodeToString(picture.getBytes());
+        
+        // Create new Picture entity
+        Picture pictureEntity = new Picture();
+        pictureEntity.setUrl("data:" + picture.getContentType() + ";base64," + base64Picture);
+        
+        // Use helper method to maintain bidirectional relationship
+        room.addPicture(pictureEntity);
+        
+        return roomRepository.save(room);
     }
 
     private void validateRoomData(Room room) {
