@@ -11,5 +11,7 @@ export interface Hotel {
     amenities: string[];
     pictures: string[];
     averageRating: number;
-    admin_id: number;  
+    totalReviews?: number;
+    adminId?: number;
+    adminEmail?: string;
 }

@@ -87,4 +87,31 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
            "AND r.checkOutTime > :currentTime " +
            "AND r.status = 'CONFIRMED'")
     List<Reservation> findCurrentReservations(@Param("guestId") Long guestId, @Param("currentTime") LocalDateTime currentTime);
+
+    // Count reservations by hotel ID
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.room.hotel.id = :hotelId")
+    long countByHotelId(Long hotelId);
+
+    // Find active reservations for a hotel
+    @Query("SELECT r FROM Reservation r WHERE r.room.hotel.id = :hotelId " +
+           "AND r.checkInTime <= :now AND r.checkOutTime >= :now " +
+           "AND r.status = 'ACTIVE'")
+    List<Reservation> findActiveReservations(Long hotelId, LocalDateTime now);
+
+    // Find reservations for a hotel ordered by creation time
+    @Query("SELECT r FROM Reservation r WHERE r.room.hotel.id = :hotelId " +
+           "ORDER BY r.createdAt DESC")
+    List<Reservation> findByHotelIdOrderByCreatedAtDesc(Long hotelId);
+
+    // Calculate revenue for a hotel within a date range
+    @Query("SELECT COALESCE(SUM(r.totalPrice), 0) FROM Reservation r " +
+           "WHERE r.room.hotel.id = :hotelId " +
+           "AND r.createdAt BETWEEN :startDate AND :endDate")
+    Double calculateRevenueForPeriod(Long hotelId, LocalDateTime startDate, LocalDateTime endDate);
+
+    // Find upcoming checkouts for a hotel
+    @Query("SELECT r FROM Reservation r WHERE r.room.hotel.id = :hotelId " +
+           "AND r.checkOutTime > :now " +
+           "ORDER BY r.checkOutTime ASC")
+    List<Reservation> findUpcomingCheckouts(Long hotelId, LocalDateTime now);
 }

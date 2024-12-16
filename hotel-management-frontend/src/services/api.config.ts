@@ -13,7 +13,11 @@ export const api = axios.create({
 // Add request interceptor to ensure consistent content type
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        // Get token from user object in localStorage
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const token = user?.token;
+        
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

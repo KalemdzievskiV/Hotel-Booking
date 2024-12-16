@@ -3,13 +3,13 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HomePageComponent } from './components/home-page/HomePageComponent';
 import AuthPage from './components/auth/AuthPage';
-import Dashboard from './components/dashboard/Dashboard';
 import HotelComponent from './components/hotels/HotelComponent';
 import UsersPage from './pages/UsersPage';
 import RoomsPage from './pages/RoomsPage';
 import CalendarPage from './pages/CalendarPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import theme from './theme/theme';
+import AdminDashboard from './components/dashboard/AdminDashboard';
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           {/* Protected Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           <Route path="/hotels" element={
@@ -49,17 +49,17 @@ function App() {
           } />
           <Route path="/bookings" element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           <Route path="/guests" element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           <Route path="/settings" element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminDashboard />
             </ProtectedRoute>
           } />
 

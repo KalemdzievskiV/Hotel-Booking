@@ -4,6 +4,13 @@ import { Hotel } from '../types/hotel.type';
 export class HotelService {
     private static readonly BASE_PATH = '/hotels';
 
+    static async getCurrentHotel(): Promise<Hotel> {
+        console.log('Fetching current user hotel...');
+        const response = await api.get(`${this.BASE_PATH}/current`);
+        console.log('Get current hotel response:', response.data);
+        return response.data;
+    }
+
     static async createHotel(hotel: Hotel): Promise<Hotel> {
         console.log('Creating hotel with data:', JSON.stringify(hotel, null, 2));
         const response = await api.post(this.BASE_PATH, hotel);

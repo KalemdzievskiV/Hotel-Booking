@@ -1,6 +1,7 @@
 package com.example.hotel_management.service;
 
 import com.example.hotel_management.dto.ReservationDTO;
+import com.example.hotel_management.dto.HotelStatsDTO;
 import com.example.hotel_management.entity.Reservation;
 import com.example.hotel_management.enums.ReservationStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,4 +118,12 @@ public interface ReservationService {
 
     @Transactional
     ReservationDTO updateReservationStatus(Long id, ReservationStatus status);
+
+    /**
+     * Get comprehensive statistics for a specific hotel
+     *
+     * @param hotelId The ID of the hotel
+     * @return HotelStatsDTO containing various statistics
+     */
+    HotelStatsDTO getHotelStats(Long hotelId);
 }

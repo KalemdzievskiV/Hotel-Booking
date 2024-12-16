@@ -9,11 +9,13 @@ import com.example.hotel_management.repository.ReservationRepository;
 import com.example.hotel_management.repository.RoomRepository;
 import com.example.hotel_management.service.ReservationService;
 import com.example.hotel_management.dto.ReservationDTO;
+import com.example.hotel_management.dto.HotelStatsDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -299,8 +301,79 @@ public class ReservationServiceImpl implements ReservationService {
         return ReservationDTO.fromEntity(updatedReservation);
     }
 
+    @Override
+    public HotelStatsDTO getHotelStats(Long hotelId) {
+        System.out.println("Calculating stats for hotel ID: " + hotelId);
+        
+        // Get total bookings
+        long totalBookings = reservationRepository.countByHotelId(hotelId);
+        System.out.println("Total bookings: " + totalBookings);
+
+        // Get active guests (current reservations)
+        LocalDateTime now = LocalDateTime.now();
+        List<Reservation> activeReservations = reservationRepository.findActiveReservations(hotelId, now);
+        int activeGuests = activeReservations.size();
+        System.out.println("Active guests: " + activeGuests);
+
+        // Get available rooms
+        int availableRooms = roomRepository.countAvailableRoomsByHotel(hotelId);
+        System.out.println("Available rooms: " + availableRooms);
+
+        // Calculate monthly revenue
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime endOfMonth = now.withDayOfMonth(now.getMonth().length(now.toLocalDate().isLeapYear()));
+        double monthlyRevenue = reservationRepository.calculateRevenueForPeriod(hotelId, startOfMonth, endOfMonth);
+        System.out.println("Monthly revenue: " + monthlyRevenue);
+
+        // Get recent bookings (last 5)
+        List<ReservationDTO> recentBookings = reservationRepository.findByHotelIdOrderByCreatedAtDesc(hotelId)
+                .stream()
+                .limit(5)
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        System.out.println("Recent bookings count: " + recentBookings.size());
+
+        // Calculate room type statistics
+        List<Object[]> roomTypeStats = roomRepository.getRoomTypeStatsByHotel(hotelId);
+        List<HotelStatsDTO.RoomTypeStatsDTO> roomTypeStatsDTOs = roomTypeStats.stream()
+                .map(stat -> {
+                    System.out.println("Room type stat: type=" + stat[0] + ", percentage=" + stat[1]);
+                    return HotelStatsDTO.RoomTypeStatsDTO.builder()
+                            .type((String) stat[0])
+                            .percentage((Double) stat[1])
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        // Get upcoming checkouts (next 5)
+        List<ReservationDTO> upcomingCheckouts = reservationRepository
+                .findUpcomingCheckouts(hotelId, now)
+                .stream()
+                .limit(5)
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        System.out.println("Upcoming checkouts count: " + upcomingCheckouts.size());
+
+        HotelStatsDTO stats = HotelStatsDTO.builder()
+                .totalBookings(totalBookings)
+                .activeGuests(activeGuests)
+                .availableRooms(availableRooms)
+                .monthlyRevenue(monthlyRevenue)
+                .recentBookings(recentBookings)
+                .roomTypeStats(roomTypeStatsDTOs)
+                .upcomingCheckouts(upcomingCheckouts)
+                .build();
+        
+        System.out.println("Returning stats: " + stats);
+        return stats;
+    }
+
     private Reservation getReservationEntityById(Long id) {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reservation not found with id: " + id));
+    }
+
+    private ReservationDTO convertToDTO(Reservation reservation) {
+        return ReservationDTO.fromEntity(reservation);
     }
 }

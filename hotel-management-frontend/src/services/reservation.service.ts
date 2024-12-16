@@ -81,13 +81,33 @@ export class ReservationService {
                 roomId,
                 reservationStatus
             });
-            // Use the full API path with /api prefix
-            const response = await api.patch(`/api/rooms/${roomId}/status/by-reservation`, { 
+            // Remove /api prefix since it's already in the baseURL
+            const response = await api.patch(`/rooms/${roomId}/status/by-reservation`, { 
                 reservationStatus 
             });
             console.log('Room status update response:', response.data);
         } catch (error) {
             console.error('Error updating room status:', error);
+            throw error;
+        }
+    }
+
+    static async getHotelReservationStats(hotelId: number): Promise<{
+        totalBookings: number;
+        activeGuests: number;
+        availableRooms: number;
+        monthlyRevenue: number;
+        recentBookings: Reservation[];
+        roomTypeStats: { type: string; percentage: number }[];
+        upcomingCheckouts: Reservation[];
+    }> {
+        try {
+            console.log('Fetching stats for hotel:', hotelId);
+            const response = await api.get(`${this.BASE_PATH}/hotel/${hotelId}/stats`);
+            console.log('Hotel stats response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching hotel stats:', error);
             throw error;
         }
     }

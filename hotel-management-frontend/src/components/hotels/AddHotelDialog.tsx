@@ -120,10 +120,10 @@ const AddHotelDialog: React.FC<AddHotelDialogProps> = ({
         return;
       }
 
-      // Create hotel with admin_id from the logged-in user
+      // Create hotel with adminId from the logged-in user
       const hotelData: Hotel = {
         ...formData as Hotel,
-        admin_id: Number(userData.id)
+        adminId: Number(userData.id)
       };
       
       console.log('Final hotel data to be sent:', JSON.stringify(hotelData, null, 2));

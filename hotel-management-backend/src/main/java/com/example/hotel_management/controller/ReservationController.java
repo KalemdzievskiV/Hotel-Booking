@@ -2,6 +2,7 @@ package com.example.hotel_management.controller;
 
 import com.example.hotel_management.dto.ReservationDTO;
 import com.example.hotel_management.dto.UpdateStatusRequest;
+import com.example.hotel_management.dto.HotelStatsDTO; // added import
 import com.example.hotel_management.entity.Reservation;
 import com.example.hotel_management.service.ReservationService;
 import jakarta.persistence.EntityNotFoundException;
@@ -91,6 +92,20 @@ public class ReservationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @GetMapping("/hotel/{hotelId}/stats")
+    public ResponseEntity<HotelStatsDTO> getHotelStats(@PathVariable Long hotelId) {
+        try {
+            System.out.println("Getting stats for hotel ID: " + hotelId);
+            HotelStatsDTO stats = reservationService.getHotelStats(hotelId);
+            System.out.println("Retrieved stats: " + stats);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            System.err.println("Error getting hotel stats: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 }
